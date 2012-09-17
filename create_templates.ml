@@ -540,7 +540,7 @@ let sles10_template name architecture ?(is_experimental=false) flags =
 
 let sles11_template = sles10_template
 
-let debian_template name release architecture ?(supports_cd=true) ?(is_experimental=false) ?(max_mem_gib=32) ?(max_vcpus=16) flags =
+let debian_template name release architecture ?(supports_cd=true) ?(is_experimental=false) ?(max_mem_gib=32) ?(max_vcpus=16) ?(cmdline="-- quiet console=hvc0") flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> max_mem_gib
 		| X64_debianlike -> max_mem_gib
@@ -548,7 +548,7 @@ let debian_template name release architecture ?(supports_cd=true) ?(is_experimen
 	in
 	let name = make_long_name name architecture is_experimental in
 	let install_arch = technical_string_of_architecture architecture in
-	let bt = eli_install_template (default_memory_parameters 128L) name "debianlike" false "-- quiet console=hvc0" in
+	let bt = eli_install_template (default_memory_parameters 128L) name "debianlike" false cmdline in
 	let methods = if supports_cd then "cdrom,http,ftp" else "http,ftp" in
 	{ bt with 
 		vM_other_config = (install_methods_otherconfig_key, methods) :: ("install-arch", install_arch) :: ("debian-release", release) :: bt.vM_other_config;
@@ -607,7 +607,7 @@ let create_all_templates rpc session_id =
 
 		debian_template "Ubuntu Maverick Meerkat 10.10" "maverick" X32 ~supports_cd:false ~is_experimental:true [    ];
 		debian_template "Ubuntu Maverick Meerkat 10.10" "maverick" X64_debianlike ~supports_cd:false ~is_experimental:true [    ];
-		debian_template "Ubuntu Precise Pangolin 12.04" "precise" X32 ~max_mem_gib:48 ~max_vcpus:8 [    ];
+		debian_template "Ubuntu Precise Pangolin 12.04" "precise" X32 ~max_mem_gib:48 ~max_vcpus:8 ~cmdline:"-- quiet console=hvc0 d-i:base-installer/kernel/image=linux-generic-pae" [    ];
 		debian_template "Ubuntu Precise Pangolin 12.04" "precise" X64_debianlike ~max_mem_gib:128 ~max_vcpus:128 [    ];
 
 		sdk_install_template
