@@ -524,7 +524,7 @@ let sles10sp1_template name architecture ?(is_experimental=false) flags =
 		vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ~vifs:3 ();
 	}
 
-let sles10_template name architecture ?(is_experimental=false) ?(vifs=7) flags =
+let sles10_template name architecture ?(is_experimental=false) flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> 16
 		| X64 -> 128 
@@ -535,7 +535,7 @@ let sles10_template name architecture ?(is_experimental=false) ?(vifs=7) flags =
 	let bt = eli_install_template (default_memory_parameters 512L) name "sleslike" true "console=ttyS0 xencons=ttyS" in
 	{ bt with
 		vM_other_config = (install_methods_otherconfig_key, "cdrom,nfs,http,ftp") :: ("install-arch",install_arch) :: bt.vM_other_config;
-		vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ~vifs:vifs ();
+		vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ();
 	}
 
 let sles11_template = sles10_template
@@ -587,12 +587,18 @@ let create_all_templates rpc session_id =
 		rhel6x_template "CentOS 6" X32 [    ];
 		rhel6x_template "CentOS 6" X64 [    ];
 
-		sles10_template "SUSE Linux Enterprise Server 10 SP1" X32 ~vifs:3 [    ];
-		sles10_template "SUSE Linux Enterprise Server 10"     X32 [    ];
-		sles11_template "SUSE Linux Enterprise Server 11"     X32 [    ];
-		sles10_template "SUSE Linux Enterprise Server 10 SP1" X64 ~vifs:3 [    ];
-		sles10_template "SUSE Linux Enterprise Server 10"     X64 [    ];
-		sles11_template "SUSE Linux Enterprise Server 11"     X64 [    ];
+		sles10sp1_template "SUSE Linux Enterprise Server 10 SP1" X32 [    ];
+		sles10_template    "SUSE Linux Enterprise Server 10 SP2" X32 [    ];
+		sles10_template    "SUSE Linux Enterprise Server 10 SP3" X32 [    ];
+		sles10_template    "SUSE Linux Enterprise Server 10 SP4" X32 [    ];
+		sles11_template    "SUSE Linux Enterprise Server 11"     X32 [    ];
+		sles11_template    "SUSE Linux Enterprise Server 11 SP1" X32 [    ];
+		sles10sp1_template "SUSE Linux Enterprise Server 10 SP1" X64 [    ];
+		sles10_template    "SUSE Linux Enterprise Server 10 SP2" X64 [    ];
+		sles10_template    "SUSE Linux Enterprise Server 10 SP3" X64 [    ];
+		sles10_template    "SUSE Linux Enterprise Server 10 SP4" X64 [    ];
+		sles11_template    "SUSE Linux Enterprise Server 11"     X64 [    ];
+		sles11_template    "SUSE Linux Enterprise Server 11 SP1" X64 [    ];
 
 		debian_template "Debian Squeeze 6.0" "squeeze" X32 ~max_vcpus:32 [    ];
 		debian_template "Debian Squeeze 6.0" "squeeze" X64_debianlike ~max_mem_gib:70 ~max_vcpus:128 [    ];
