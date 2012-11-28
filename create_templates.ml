@@ -293,24 +293,6 @@ let eli_install_template memory name distro nfs pv_args =
         ];
   }
 
-let sdk_install_template =
-  let root = { device = "0"; size = (12L ** gib); sr = preferred_sr; bootable = true; _type = `system } in
-  { (blank_template (default_memory_parameters 1024L)) with
-      vM_name_label = "Xen API SDK";
-      vM_name_description = "Use this template to install a Xen API SDK using installation media";
-      vM_PV_bootloader = "eliloader";
-      vM_PV_args = "xencons=hvc console=hvc0 install answerfile=file:///sdk.answerfile";
-      vM_HVM_boot_policy = "";
-      vM_other_config =
-        [
-          disks_key, Xml.to_string (xml_of_disks [ root ]);
-          distros_otherconfig_key, "pygrub";
-          install_methods_otherconfig_key, "cdrom,http,ftp";
-          "install-kernel", "vmlinuz";
-          "install-ramdisk", "install.img"
-        ];
-  }
-
 (* Demonstration templates ---------------------------------------------------*)
 
 let base_path = "/opt/xensource"
@@ -609,8 +591,6 @@ let create_all_templates rpc session_id =
 		debian_template "Ubuntu Maverick Meerkat 10.10" "maverick" X64_debianlike ~supports_cd:false ~is_experimental:true [    ];
 		debian_template "Ubuntu Precise Pangolin 12.04" "precise" X32 ~max_mem_gib:48 ~max_vcpus:8 ~cmdline:"-- quiet console=hvc0 d-i:base-installer/kernel/image=linux-generic-pae" [    ];
 		debian_template "Ubuntu Precise Pangolin 12.04" "precise" X64_debianlike ~max_mem_gib:128 ~max_vcpus:128 [    ];
-
-		sdk_install_template
 	] in
 
 	let hvm_static_templates =
