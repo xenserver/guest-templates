@@ -17,7 +17,7 @@ open Client
 
 let rpc xml =
     let open Xmlrpc_client in
-    XML_protocol.rpc ~transport:(Unix "/var/xapi/xapi") ~http:(xmlrpc ~version:"1.0" "/") xml
+    XMLRPC_protocol.rpc ~transport:(Unix "/var/xapi/xapi") ~http:(xmlrpc ~version:"1.0" "/") xml
 
 let _ =
     let session_id = Client.Session.login_with_password ~rpc ~uname:"" ~pwd:"" ~version:"1.0" in
