@@ -623,8 +623,8 @@ let create_all_templates rpc session_id =
 		hvm_template "Windows Vista"              X32 1024 24 [n;  v;] "0002";
 		hvm_template "Windows 7"                  X32 1024 24 [n;  v;] "0002";
 		hvm_template "Windows 7"                  X64 2048 24 [n;  v;] "0002";
-		hvm_template "Windows 8"                  X32 ~is_experimental:true 1024 24 [n;  v;  s;] "0002";
-		hvm_template "Windows 8"                  X64 ~is_experimental:true 2048 24 [n;  v;  s;] "0002";
+		hvm_template "Windows 8"                  X32 1024 24 [n;v;s;] "0002";
+		hvm_template "Windows 8"                  X64 2048 24 [n;v;s;] "0002";
 		hvm_template "Windows Server 2003"        X32  256 16 [    v;] "";
 		hvm_template "Windows Server 2003"        X32  256 16 [  x;v;] "";
 		hvm_template "Windows Server 2003"        X64  256 16 [n;  v;] "";
@@ -635,7 +635,7 @@ let create_all_templates rpc session_id =
 		hvm_template "Windows Server 2008"        X64  512 24 [n;x;v;] "0002";
 		hvm_template "Windows Server 2008 R2"     X64  512 24 [n;  v;] "0002";
 		hvm_template "Windows Server 2008 R2"     X64  512 24 [n;x;v;] "0002";
-		hvm_template "Windows Server 2012"     	  X64 ~is_experimental:true 1024 24 [n;  v;  s;] "0002";
+		hvm_template "Windows Server 2012"     	  X64 1024 24 [n;v;s;] "0002";
 	] in
 
 	(* put default_template key in static_templates other_config of static_templates: *)
