@@ -361,16 +361,14 @@ type architecture =
 	| X32
 	| X64
 	| X64_debianlike
-	| X64_sol
 
 let friendly_string_of_architecture = function
 	| X32 -> " (32-bit)"
 	| X64 | X64_debianlike -> " (64-bit)"
-	| X64_sol -> ""	
 
 let technical_string_of_architecture = function
 	| X32 -> "i386"
-	| X64 | X64_sol -> "x86_64"
+	| X64 -> "x86_64"
 	| X64_debianlike -> "amd64"
 
 let make_long_name name architecture is_experimental =
@@ -392,7 +390,7 @@ let hvm_template
 	} in
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> 64
-		| X64 | X64_sol -> 128 
+		| X64 -> 128 
 		| X64_debianlike -> assert false
 	in
 	let base = other_install_media_template
@@ -450,7 +448,7 @@ let rhel5x_template name architecture ?(is_experimental=false) flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> 16
 		| X64 -> 16
-		| X64_sol | X64_debianlike -> assert false
+		| X64_debianlike -> assert false
 	in
 	let name = make_long_name name architecture is_experimental in
 	let bt = eli_install_template (default_memory_parameters 512L) name "rhlike" true "graphical utf8" in
@@ -467,7 +465,7 @@ let oracle_template name architecture ?(is_experimental=false) flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> 64
 		| X64 -> 128
-		| X64_sol | X64_debianlike -> assert false
+		| X64_debianlike -> assert false
 	in
 	let name = make_long_name name architecture is_experimental in
 	let bt = eli_install_template (default_memory_parameters 512L) name "rhlike" true "graphical utf8" in
@@ -484,7 +482,7 @@ let rhel6x_template name architecture ?(is_experimental=false) flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> 16
 		| X64 -> 128
-		| X64_sol | X64_debianlike -> assert false
+		| X64_debianlike -> assert false
 	in
 	let name = make_long_name name architecture is_experimental in
 	let bt = eli_install_template (default_memory_parameters 512L) name "rhlike" true "graphical utf8" in
@@ -500,7 +498,7 @@ let rhel6x_template name architecture ?(is_experimental=false) flags =
 let sles_9_template name architecture ?(is_experimental=false) flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> 16
-		| X64 | X64_sol | X64_debianlike -> assert false
+		| X64 | X64_debianlike -> assert false
 	in
 	let name = make_long_name name architecture is_experimental in
 	let install_arch = technical_string_of_architecture architecture in
@@ -514,7 +512,7 @@ let sles10sp1_template name architecture ?(is_experimental=false) flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> 16
 		| X64 -> 128 
-		| X64_sol | X64_debianlike -> assert false
+		| X64_debianlike -> assert false
 	in
 	let name = make_long_name name architecture is_experimental in
 	let install_arch = technical_string_of_architecture architecture in
@@ -528,7 +526,7 @@ let sles10_template name architecture ?(is_experimental=false) flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> 16
 		| X64 -> 128 
-		| X64_sol | X64_debianlike -> assert false
+		| X64_debianlike -> assert false
 	in
 	let name = make_long_name name architecture is_experimental in
 	let install_arch = technical_string_of_architecture architecture in
@@ -544,7 +542,7 @@ let debian_template name release architecture ?(supports_cd=true) ?(is_experimen
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> max_mem_gib
 		| X64_debianlike -> max_mem_gib
-		| X64_sol | X64 -> assert false
+		| X64 -> assert false
 	in
 	let name = make_long_name name architecture is_experimental in
 	let install_arch = technical_string_of_architecture architecture in
@@ -637,7 +635,6 @@ let create_all_templates rpc session_id =
 		hvm_template "Windows Server 2008 R2"     X64  512 24 [n;  v;] "0002";
 		hvm_template "Windows Server 2008 R2"     X64  512 24 [n;x;v;] "0002";
 		hvm_template "Windows Server 2012"     	  X64 ~is_experimental:true 1024 24 [n;  v;  s;] "0002";
-		hvm_template "Solaris 10"                 X64_sol ~is_experimental:true 1024 24 [n;    ] "";
 	] in
 
 	(* put default_template key in static_templates other_config of static_templates: *)
