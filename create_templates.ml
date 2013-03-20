@@ -112,52 +112,6 @@ let version_of_tools_vdi rpc session_id vdi =
 (* From Miami GA onward we identify the tools SR with the SR.other_config key: *)
 let tools_sr_tag = "xenserver_tools_sr"
 
-(** Return a reference to a VDI in the XenSource Tools SR, identified by its 
-    sm-config keys. We always invoke an SR.scan to be sure in the upgrade
-    case we find the latest version of the VDI. Nb. we require the tools VDI
-    to have sm-config keys: 'xs-tools=true' and 'xs-tools-version=x.y.z' where
-    x,y,z are numbers. If the tools VDI has key 'xs-tools-build=b' then this is
-    used to distinguish between builds of the tools VDI.  *)
-let find_xs_tools_vdi rpc session_id = 
-  (* Find the SR first *)
-  let srs = List.filter (fun sr -> List.mem_assoc tools_sr_tag (Client.SR.get_other_config rpc session_id sr)) (Client.SR.get_all rpc session_id) in
-  
-  let find_vdi sr = 
-    begin 
-      try
-	Client.SR.scan rpc session_id sr
-      with e ->
-	error "Scan of tools SR failed - exception was '%s'" (Printexc.to_string e);
-	error "Ignoring error and continuing"
-    end;
-    
-    let vdis = Client.SR.get_VDIs rpc session_id sr in
-    begin 
-	match List.filter (fun self -> 
-	  let sm_config = Client.VDI.get_sm_config rpc session_id self in
-	  try List.assoc "xs-tools" sm_config = "true" with _ -> false) vdis 
-	with
-	  | [] -> None
-	  | [ vdi ] -> Some vdi
-	  | vdis -> 
-	      let sorted = List.sort 
-		(fun vdi1 vdi2 ->
-		  let major1, minor1, micro1, build1 = version_of_tools_vdi rpc session_id vdi1 in
-		  let major2, minor2, micro2, build2 = version_of_tools_vdi rpc session_id vdi2 in
-		  0 +
-		    8 * (compare major1 major2) +
-		    4 * (compare minor1 minor2) +
-		    2 * (compare micro1 micro2) +
-		    1 * (compare build1 build2)
-		) vdis in
-	      let newest = List.hd (List.rev sorted) in
-	      Some newest
-    end in
-  match srs with
-    | [] -> warn "No Tools SR could be found"; None
-    | [ sr ] -> find_vdi sr
-    | sr::_ -> warn "Multiple Tools SRs detected, choosing one at random"; find_vdi sr
-	
 (** Values of memory parameters for templates. *)
 type template_memory_parameters = {
 	memory_static_min_mib : int64;
@@ -475,19 +429,6 @@ let rhel6x_template name architecture ?(is_experimental=false) flags =
 	{ bt with 
 		vM_other_config = (install_methods_otherconfig_key, "cdrom,nfs,http,ftp") :: ("rhel6","true") :: m_a_s @ bt.vM_other_config;
 		vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ();
-	}
-
-let sles_9_template name architecture ?(is_experimental=false) flags =
-	let maximum_supported_memory_gib = match architecture with
-		| X32 -> 16
-		| X64 | X64_debianlike -> assert false
-	in
-	let name = make_long_name name architecture is_experimental in
-	let install_arch = technical_string_of_architecture architecture in
-	let bt = eli_install_template (default_memory_parameters 256L) name "sleslike" true "console=ttyS0 xencons=ttyS" in
-	{ bt with 
-		vM_other_config = (install_methods_otherconfig_key, "nfs,http,ftp") :: ("install-arch",install_arch) :: bt.vM_other_config;
-		vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ~vifs:3 ();
 	}
 
 let sles10sp1_template name architecture ?(is_experimental=false) flags =
