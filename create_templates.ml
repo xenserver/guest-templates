@@ -206,7 +206,7 @@ let blank_template memory = {
 	vM_VGPUs = [];
 	vM_attached_PCIs = [];
 	vM_version = 0L;
-	vM_generation_id = "0:0";
+	vM_generation_id = "";
 }
 
 let other_install_media_template memory = 
@@ -314,6 +314,7 @@ let make_long_name name architecture is_experimental =
 
 let hvm_template
 		name architecture ?(is_experimental=false)
+		?(generation_id=false)
 		minimum_supported_memory_mib
 		root_disk_size_gib
 		flags 
@@ -359,6 +360,7 @@ let hvm_template
 		vM_HVM_shadow_multiplier =
 			(if xen_app then 4.0 else base.vM_HVM_shadow_multiplier);
 		vM_recommendations = (recommendations ~memory:maximum_supported_memory_gib ());
+		vM_generation_id = if generation_id then "0:0" else "";
 	}
 
 (* machine-address-size key-name/value; goes in other-config of RHEL5.2 template *)
@@ -548,8 +550,8 @@ let create_all_templates rpc session_id =
 		hvm_template "Windows Vista"              X32 1024 24 [n;  v;] "0002";
 		hvm_template "Windows 7"                  X32 1024 24 [n;  v;] "0002";
 		hvm_template "Windows 7"                  X64 2048 24 [n;  v;] "0002";
-		hvm_template "Windows 8"                  X32 1024 24 [n;v;s;] "0002";
-		hvm_template "Windows 8"                  X64 2048 24 [n;v;s;] "0002";
+		hvm_template "Windows 8"                  ~generation_id:true X32 1024 24 [n;v;s;] "0002";
+		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24 [n;v;s;] "0002";
 		hvm_template "Windows Server 2003"        X32  256 16 [    v;] "";
 		hvm_template "Windows Server 2003"        X32  256 16 [  x;v;] "";
 		hvm_template "Windows Server 2003"        X64  256 16 [n;  v;] "";
@@ -560,7 +562,7 @@ let create_all_templates rpc session_id =
 		hvm_template "Windows Server 2008"        X64  512 24 [n;x;v;] "0002";
 		hvm_template "Windows Server 2008 R2"     X64  512 24 [n;  v;] "0002";
 		hvm_template "Windows Server 2008 R2"     X64  512 24 [n;x;v;] "0002";
-		hvm_template "Windows Server 2012"     	  X64 1024 24 [n;v;s;] "0002";
+		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 24 [n;v;s;] "0002";
 	] in
 
 	(* put default_template key in static_templates other_config of static_templates: *)
