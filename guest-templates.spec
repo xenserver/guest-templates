@@ -5,7 +5,7 @@ Name:    guest-templates
 Version: @VERSION@
 Release: @RELEASE@
 Group:   System/Hypervisor
-License: LGPL+linking exception
+License: BSD
 URL:  http://www.xen.org
 Source0: guest-templates-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
