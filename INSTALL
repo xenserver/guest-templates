@@ -1,0 +1,2 @@
+At present it is not possible to build this package outside of the XenServer
+build environment. The INSTALL file will be updated when this becomes possible.
