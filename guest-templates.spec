@@ -9,7 +9,7 @@ License: BSD
 URL:  http://www.xen.org
 Source0: guest-templates-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
-BuildRequires: ocaml, ocaml-findlib, ocaml-camlp4, ocaml-type-conv, ocaml-getopt, omake, xapi-client-devel, xapi-libs-devel
+BuildRequires: ocaml, ocaml-findlib, ocaml-camlp4, ocaml-type-conv, ocaml-getopt, omake, xapi-client-devel, ocaml-stdext-devel
 
 %description
 This package contains a program which creates the default XCP templates, required by xapi at first boot time.
