@@ -37,7 +37,7 @@
 open API
 open Stringext
 
-module D = Debug.Debugger(struct let name="xapi" end)
+module D = Debug.Make(struct let name="xapi" end)
 open D
 let ( ** ) a b = Int64.mul a b
 let kib = 1024L
