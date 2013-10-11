@@ -52,7 +52,7 @@ let default_viridian_key_value = "true"
 let viridian_flag = viridian_key_name, default_viridian_key_value
 let nx_flag = ("nx","true")
 let no_nx_flag = ("nx","false")
-let base_platform_flags = ["acpi","1";"apic","true";"pae","true"]
+let base_platform_flags = ["acpi","1";"apic","true";"pae","true";"hpet","true"]
 
 let default_template_key = "default_template"
 let linux_template_key = "linux_template"
