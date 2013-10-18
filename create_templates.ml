@@ -581,7 +581,7 @@ let create_all_templates rpc session_id =
 		hvm_template "Windows Server 2008"        X64  512 24 [n;x;v;] "0002";
 		hvm_template "Windows Server 2008 R2"     X64  512 24 [n;  v;] "0002";
 		hvm_template "Windows Server 2008 R2"     X64  512 24 [n;x;v;] "0002";
-		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 24 [n;v;s;] "0002";
+		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 32 [n;v;s;] "0002";
 	] in
 
 	(* put default_template key in static_templates other_config of static_templates: *)
