@@ -636,6 +636,8 @@ let create_all_templates rpc session_id =
 		debian_template "Ubuntu Maverick Meerkat 10.10" "maverick" X64_debianlike ~supports_cd:false ~is_experimental:true [    ];
 		debian_template "Ubuntu Precise Pangolin 12.04" "precise" X32 ~max_vcpus:8 ~cmdline:"-- quiet console=hvc0 d-i:base-installer/kernel/image=linux-generic-pae" [    ];
 		debian_template "Ubuntu Precise Pangolin 12.04" "precise" X64_debianlike ~max_mem_gib:128 ~max_vcpus:128 [    ];
+		debian_template "Ubuntu Trusty Tahr 14.04" "trusty" X32 ~max_vcpus:8 ~cmdline:"console=hvc0" [    ];
+		debian_template "Ubuntu Trusty Tahr 14.04" "trusty" X64_debianlike ~max_mem_gib:128 ~max_vcpus:128 [    ];
 
 		sdk_install_template
 	] in
