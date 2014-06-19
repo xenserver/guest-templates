@@ -40,7 +40,7 @@ wait_for_xapi() {
 	    logger -t ${TAG} "detected xapi init complete after ${RETRY} / ${MAX_RETRIES} s"
 	    return 0
 	fi
-	sleep 1
+	sleep 5
 	RETRY=$(( ${RETRY} + 1 ))
     done
     logger -t ${TAG} "failed to detect xapi init complete after ${MAX_RETRIES}s"
