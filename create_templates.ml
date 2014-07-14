@@ -453,6 +453,57 @@ let rhel6x_template name architecture ?(is_experimental=false) flags =
 		vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ();
 	}
 
+type memory =
+| MiB of int
+| GiB of int
+
+let to_mib memory = 
+  match memory with
+  | MiB m -> m
+  | GiB g -> g * 1024
+
+let to_gib memory =
+  match memory with
+  | MiB m -> m / 1024
+  | GiB g -> g
+    
+let hvm_linux_template
+    name ?(is_experimental=false)
+    min_memory
+    max_memory
+    root_disk_size =
+  let root = {
+    device = "0";
+    size = Int64.of_int (to_gib root_disk_size) ** gib;
+    sr = preferred_sr;
+    bootable = true;
+    _type = `system
+  } in
+  let base = other_install_media_template
+    (default_memory_parameters (Int64.of_int (to_mib min_memory))) in
+  let name = if is_experimental then name ^ " (experimental)" else name in
+  let platform_flags = base_platform_flags
+    @ (["vga","std";"videoram","8"])
+    @ [nx_flag]
+    @ (["viridian", "false"])
+    @ ([ "device_id", "0001" ])
+  in
+  let max_memory_gib = to_gib max_memory in
+  {
+    base with
+      vM_name_label = name;
+      vM_name_description = Printf.sprintf "To use this template from the CLI, install your VM using vm-install, then set other-config-install-repository to the path to your network repository, e.g. http://<server>/<path> or nfs:server:/<path>";
+      vM_other_config = [
+        disks_key, Xml.to_string (xml_of_disks [ root ]);
+	(install_methods_otherconfig_key, "cdrom,nfs,http,ftp")
+      ];
+      vM_platform = platform_flags;
+      vM_HVM_boot_params = [ Constants.hvm_boot_params_order, "cdn" ];
+      vM_HVM_shadow_multiplier = base.vM_HVM_shadow_multiplier;
+      vM_recommendations = (recommendations ~memory:max_memory_gib ());
+      vM_generation_id = ""; 
+  }
+    
 let sles10sp1_template name architecture ?(is_experimental=false) flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> 16
@@ -529,6 +580,9 @@ let create_all_templates rpc session_id =
 		rhel6x_template "Oracle Enterprise Linux 6" X64 [    ];
 		rhel6x_template "CentOS 6" X32 [    ];
 		rhel6x_template "CentOS 6" X64 [    ];
+		hvm_linux_template "Red Hat Enterprise Linux 7" (MiB 512) (GiB 512)  (GiB 8);
+		hvm_linux_template "Ubuntu Trusty Tahr 14.04" (MiB 512) (GiB 512)  (GiB 8);
+		hvm_linux_template "SUSE Linux Enterprise Server 12" ~is_experimental:true (MiB 512) (GiB 512) (GiB 8);
 
 		sles10sp1_template "SUSE Linux Enterprise Server 10 SP1" X32 [    ];
 		sles10_template    "SUSE Linux Enterprise Server 10 SP2" X32 [    ];
@@ -537,6 +591,7 @@ let create_all_templates rpc session_id =
 		sles11_template    "SUSE Linux Enterprise Server 11"     X32 [    ];
 		sles11_template    "SUSE Linux Enterprise Server 11 SP1" X32 [    ];
 		sles11_template    "SUSE Linux Enterprise Server 11 SP2" X32 [    ];
+		sles11_template    "SUSE Linux Enterprise Server 11 SP3" X32 [    ];
 		sles10sp1_template "SUSE Linux Enterprise Server 10 SP1" X64 [    ];
 		sles10_template    "SUSE Linux Enterprise Server 10 SP2" X64 [    ];
 		sles10_template    "SUSE Linux Enterprise Server 10 SP3" X64 [    ];
@@ -544,6 +599,7 @@ let create_all_templates rpc session_id =
 		sles11_template    "SUSE Linux Enterprise Server 11"     X64 [    ];
 		sles11_template    "SUSE Linux Enterprise Server 11 SP1" X64 [    ];
 		sles11_template    "SUSE Linux Enterprise Server 11 SP2" X64 [    ];
+		sles11_template    "SUSE Linux Enterprise Server 11 SP3" X64 [    ];
 
 		debian_template "Debian Squeeze 6.0" "squeeze" X32 ~max_vcpus:32 [    ];
 		debian_template "Debian Squeeze 6.0" "squeeze" X64_debianlike ~max_mem_gib:70 ~max_vcpus:32 [    ];
