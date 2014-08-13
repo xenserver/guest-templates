@@ -424,7 +424,7 @@ let hvm_template
 		(make_long_name name architecture is_experimental) in
 	let platform_flags = base_platform_flags
 		@ (if List.mem StdVga flags then ["vga","std";"videoram","8"] else [])
-		@ (if List.mem Viridian flags then [ viridian_flag;viridian_time_ref_count;viridian_reference_tsc ] else [])
+		@ (if List.mem Viridian flags then [ viridian_flag;viridian_time_ref_count_flag;viridian_reference_tsc_flag ] else [])
 		@ (if device_id <> "" then [ "device_id", device_id ] else []) in
 	{
 		base with
