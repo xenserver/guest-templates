@@ -659,6 +659,7 @@ let create_all_templates rpc session_id =
 		rhel6x_template "CentOS 6" X64 [    ];
 		hvm_linux_template "Red Hat Enterprise Linux 7" (MiB 512) (GiB 512)  (GiB 8);
 		hvm_linux_template "CentOS 7" (MiB 512) (GiB 512)  (GiB 8);
+		hvm_linux_template "Oracle Linux 7" (MiB 512) (GiB 512)  (GiB 8);
 		hvm_linux_template "Ubuntu Trusty Tahr 14.04" (MiB 512) (GiB 512)  (GiB 8);
 		hvm_linux_template "SUSE Linux Enterprise Server 12" ~is_experimental:true (MiB 512) (GiB 512) (GiB 8);
 
