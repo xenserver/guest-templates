@@ -50,6 +50,7 @@ let viridian_key_name = "viridian"
 let default_viridian_key_value = "true"
 
 let viridian_flag = viridian_key_name, default_viridian_key_value
+let viridian_time_ref_count_flag = ("viridian_time_ref_count","true")
 let nx_flag = ("nx","true")
 let no_nx_flag = ("nx","false")
 let base_platform_flags = ["acpi","1";"apic","true";"pae","true"]
@@ -423,7 +424,7 @@ let hvm_template
 		(make_long_name name architecture is_experimental) in
 	let platform_flags = base_platform_flags
 		@ (if List.mem StdVga flags then ["vga","std";"videoram","8"] else [])
-		@ (if List.mem Viridian flags then [ viridian_flag ] else [])
+		@ (if List.mem Viridian flags then [ viridian_flag;viridian_time_ref_count_flag ] else [])
 		@ (if device_id <> "" then [ "device_id", device_id ] else []) in
 	{
 		base with
