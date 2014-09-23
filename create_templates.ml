@@ -684,8 +684,8 @@ let create_all_templates rpc session_id =
 
  		debian_template "Debian Squeeze 6.0" "squeeze" X32 ~max_vcpus:32 [    ];
  		debian_template "Debian Squeeze 6.0" "squeeze" X64_debianlike ~max_mem_gib:70 ~max_vcpus:32 [    ];
-		debian_template "Debian Wheezy 7" "wheezy" X32 ~max_vcpus:32 [    ];
-		debian_template "Debian Wheezy 7" "wheezy" X64_debianlike ~max_mem_gib:128 ~max_vcpus:32 [    ];
+		debian_template "Debian Wheezy 7.0" "wheezy" X32 ~max_vcpus:32 [    ];
+		debian_template "Debian Wheezy 7.0" "wheezy" X64_debianlike ~max_mem_gib:128 ~max_vcpus:32 [    ];
 
 		debian_template "Ubuntu Lucid Lynx 10.04" "lucid" X32 ~supports_cd:false [    ];
 		debian_template "Ubuntu Lucid Lynx 10.04" "lucid" X64_debianlike ~supports_cd:false [    ];
