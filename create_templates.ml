@@ -663,7 +663,6 @@ let create_all_templates rpc session_id =
 		hvm_linux_template "CentOS 7" (MiB 512) (GiB 512)  (GiB 8);
 		hvm_linux_template "Oracle Linux 7" (MiB 512) (GiB 512)  (GiB 8);
 		hvm_linux_template "Ubuntu Trusty Tahr 14.04" (MiB 512) (GiB 512)  (GiB 8);
-		hvm_linux_template "SUSE Linux Enterprise Server 12" ~is_experimental:true (MiB 512) (GiB 512) (GiB 8);
 
 		sles10sp1_template "SUSE Linux Enterprise Server 10 SP1" X32 [    ];
 		sles10_template    "SUSE Linux Enterprise Server 10 SP2" X32 [    ];
@@ -681,6 +680,7 @@ let create_all_templates rpc session_id =
 		sles11_template    "SUSE Linux Enterprise Server 11 SP1" X64 [    ];
 		sles11_template    "SUSE Linux Enterprise Server 11 SP2" X64 [    ];
 		sles11_template    "SUSE Linux Enterprise Server 11 SP3" X64 [    ];
+		sles11_template    "SUSE Linux Enterprise Server 12"     X64 [    ];
 
  		debian_template "Debian Squeeze 6.0" "squeeze" X32 ~max_vcpus:32 [    ];
  		debian_template "Debian Squeeze 6.0" "squeeze" X64_debianlike ~max_mem_gib:70 ~max_vcpus:32 [    ];
