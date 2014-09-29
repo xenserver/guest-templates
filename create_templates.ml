@@ -659,11 +659,10 @@ let create_all_templates rpc session_id =
 		rhel6x_template "Oracle Enterprise Linux 6" X64 [    ];
 		rhel6x_template "CentOS 6" X32 [    ];
 		rhel6x_template "CentOS 6" X64 [    ];
-		hvm_linux_template "Red Hat Enterprise Linux 7" (MiB 512) (GiB 512)  (GiB 8);
-		hvm_linux_template "CentOS 7" (MiB 512) (GiB 512)  (GiB 8);
-		hvm_linux_template "Oracle Linux 7" (MiB 512) (GiB 512)  (GiB 8);
+		hvm_linux_template "Red Hat Enterprise Linux 7" (GiB 1) (GiB 512)  (GiB 10);
+		hvm_linux_template "CentOS 7" (GiB 1) (GiB 512)  (GiB 10);
+		hvm_linux_template "Oracle Linux 7" (GiB 1) (GiB 512)  (GiB 10);
 		hvm_linux_template "Ubuntu Trusty Tahr 14.04" (MiB 512) (GiB 512)  (GiB 8);
-
 		sles10sp1_template "SUSE Linux Enterprise Server 10 SP1" X32 [    ];
 		sles10_template    "SUSE Linux Enterprise Server 10 SP2" X32 [    ];
 		sles10_template    "SUSE Linux Enterprise Server 10 SP3" X32 [    ];
