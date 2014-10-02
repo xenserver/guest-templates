@@ -50,7 +50,7 @@ let viridian_key_name = "viridian"
 let default_viridian_key_value = "true"
 
 let viridian_flag = viridian_key_name, default_viridian_key_value
-let viridian_time_ref_count_flag = ("viridian_time_ref_count","true")
+let viridian_time_ref_count_flag = ("viridian_time_ref_count","false")
 let nx_flag = ("nx","true")
 let no_nx_flag = ("nx","false")
 let base_platform_flags = ["acpi","1";"apic","true";"pae","true"]
