@@ -402,6 +402,7 @@ let hvm_template
 		?(generation_id=false)
 		minimum_supported_memory_mib
 		root_disk_size_gib
+		maximum_supported_memory_gib
 		flags 
 		device_id =
 	let root = {
@@ -411,11 +412,6 @@ let hvm_template
 		bootable = false;
 		_type = `system
 	} in
-	let maximum_supported_memory_gib = match architecture with
-		| X32 -> 64
-		| X64 -> 128 
-		| X64_debianlike -> assert false
-	in
 	let base = other_install_media_template
 		(default_memory_parameters (Int64.of_int minimum_supported_memory_mib)) in
 	let xen_app = List.mem XenApp flags in
@@ -704,24 +700,24 @@ let create_all_templates rpc session_id =
 		let s = StdVga   in
 	[
 		other_install_media_template (default_memory_parameters 128L);
-		hvm_template "Windows XP SP3"             X32  256 16 [    v;] "";
-		hvm_template "Windows Vista"              X32 1024 24 [n;  v;] "0002";
-		hvm_template "Windows 7"                  X32 1024 24 [n;  v;] "0002";
-		hvm_template "Windows 7"                  X64 2048 24 [n;  v;] "0002";
-		hvm_template "Windows 8"                  ~generation_id:true X32 1024 24 [n;v;s;] "0002";
-		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24 [n;v;s;] "0002";
-		hvm_template "Windows Server 2003"        X32  256 16 [    v;] "";
-		hvm_template "Windows Server 2003"        X32  256 16 [  x;v;] "";
-		hvm_template "Windows Server 2003"        X64  256 16 [n;  v;] "";
-		hvm_template "Windows Server 2003"        X64  256 16 [n;x;v;] "";
-		hvm_template "Windows Server 2008"        X32  512 24 [n;  v;] "0002";
-		hvm_template "Windows Server 2008"        X32  512 24 [n;x;v;] "0002";
-		hvm_template "Windows Server 2008"        X64  512 24 [n;  v;] "0002";
-		hvm_template "Windows Server 2008"        X64  512 24 [n;x;v;] "0002";
-		hvm_template "Windows Server 2008 R2"     X64  512 24 [n;  v;] "0002";
-		hvm_template "Windows Server 2008 R2"     X64  512 24 [n;x;v;] "0002";
-		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 32 [n;v;s;] "0002";
-		hvm_template "Windows Server 2012 R2"     ~generation_id:true X64 1024 32 [n;v;s;] "0002";
+		hvm_template "Windows XP SP3"             X32  256 16   4 [    v;] "";
+		hvm_template "Windows Vista"              X32 1024 24   4 [n;  v;] "0002";
+		hvm_template "Windows 7"                  X32 1024 24   4 [n;  v;] "0002";
+		hvm_template "Windows 7"                  X64 2048 24 128 [n;  v;] "0002";
+		hvm_template "Windows 8"                  ~generation_id:true X32 1024 24   4 [n;v;s;] "0002";
+		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24 128 [n;v;s;] "0002";
+		hvm_template "Windows Server 2003"        X32  256 16  64 [    v;] "";
+		hvm_template "Windows Server 2003"        X32  256 16  64 [  x;v;] "";
+		hvm_template "Windows Server 2003"        X64  256 16 128 [n;  v;] "";
+		hvm_template "Windows Server 2003"        X64  256 16 128 [n;x;v;] "";
+		hvm_template "Windows Server 2008"        X32  512 24  64 [n;  v;] "0002";
+		hvm_template "Windows Server 2008"        X32  512 24  64 [n;x;v;] "0002";
+		hvm_template "Windows Server 2008"        X64  512 24 128 [n;  v;] "0002";
+		hvm_template "Windows Server 2008"        X64  512 24 128 [n;x;v;] "0002";
+		hvm_template "Windows Server 2008 R2"     X64  512 24 128 [n;  v;] "0002";
+		hvm_template "Windows Server 2008 R2"     X64  512 24 128 [n;x;v;] "0002";
+		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 32 128 [n;v;s;] "0002";
+		hvm_template "Windows Server 2012 R2"     ~generation_id:true X64 1024 32 128 [n;v;s;] "0002";
 	] in
 
 	(* put default_template key in static_templates other_config of static_templates: *)
