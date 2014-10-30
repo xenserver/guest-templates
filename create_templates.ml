@@ -50,6 +50,7 @@ let viridian_key_name = "viridian"
 let default_viridian_key_value = "true"
 
 let viridian_flag = viridian_key_name, default_viridian_key_value
+let viridian_time_ref_count_flag = ("viridian_time_ref_count","true")
 let nx_flag = ("nx","true")
 let no_nx_flag = ("nx","false")
 let base_platform_flags = ["acpi","1";"apic","true";"pae","true";"hpet","true"]
@@ -97,13 +98,14 @@ let xml_of_disk disk =
 let xml_of_disks disks = Xml.Element("provision", [], List.map xml_of_disk disks)
 
 (* template restrictions (added to recommendations field for UI) *)
-let recommendations ?(memory=128) ?(vcpus=16) ?(vbds=16) ?(vifs=7) () =
+let recommendations ?(memory=128) ?(vcpus=16) ?(vbds=16) ?(vifs=7) ?(fields=[]) () =
   let ( ** ) = Int64.mul in
     "<restrictions>"
     ^"<restriction field=\"memory-static-max\" max=\""^(Int64.to_string ((Int64.of_int memory) ** 1024L ** 1024L ** 1024L))^"\" />"
     ^"<restriction field=\"vcpus-max\" max=\""^(string_of_int vcpus)^"\" />"
     ^"<restriction property=\"number-of-vbds\" max=\""^(string_of_int vbds)^"\" />"
     ^"<restriction property=\"number-of-vifs\" max=\""^(string_of_int vifs)^"\" />"
+    ^(String.concat "" (List.map (fun (field, value) -> "<restriction field=\"" ^ field ^ "\" value=\"" ^ value ^ "\" />") fields))
     ^"</restrictions>"
 
 
@@ -354,7 +356,7 @@ let hvm_template
 		(make_long_name name architecture is_experimental) in
 	let platform_flags = base_platform_flags
 		@ (if List.mem StdVga flags then ["vga","std";"videoram","8"] else [])
-		@ (if List.mem Viridian flags then [ viridian_flag ] else [])
+		@ (if List.mem Viridian flags then [ viridian_flag;viridian_time_ref_count_flag ] else [])
 		@ (if device_id <> "" then [ "device_id", device_id ] else []) in
 	{
 		base with
@@ -398,7 +400,7 @@ let rhel4x_template name architecture ?(is_experimental=false) flags =
 		vM_recommendations = recommendations ~memory:16 ~vifs:3 ();
 	}
 
-let rhel5x_template name architecture ?(is_experimental=false) flags =
+let rhel5x_template name architecture ?(is_experimental=false) ?(max_vcpus=32) flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> 16
 		| X64 -> 16
@@ -412,10 +414,10 @@ let rhel5x_template name architecture ?(is_experimental=false) flags =
 		else [] in
 	{ bt with
 		vM_other_config = (install_methods_otherconfig_key, "cdrom,nfs,http,ftp") :: ("rhel5","true") :: m_a_s @ bt.vM_other_config;
-		vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ();
+		vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ~vcpus:max_vcpus ();
 	}
 
-let oracle_template name architecture ?(is_experimental=false) flags =
+let oracle_template name architecture ?(is_experimental=false) ?(max_vcpus=32) flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> 64
 		| X64 -> 128
@@ -429,10 +431,10 @@ let oracle_template name architecture ?(is_experimental=false) flags =
 		else [] in
 	{ bt with 
 		vM_other_config = (install_methods_otherconfig_key, "cdrom,nfs,http,ftp") :: ("rhel5","true") :: m_a_s @ bt.vM_other_config;
-		vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ();
+		vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ~vcpus:max_vcpus ();
 	}
 
-let rhel6x_template name architecture ?(is_experimental=false) flags =
+let rhel6x_template name architecture ?(is_experimental=false) ?(max_vcpus=32) flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> 16
 		| X64 -> 128
@@ -446,7 +448,7 @@ let rhel6x_template name architecture ?(is_experimental=false) flags =
 		else [] in
 	{ bt with 
 		vM_other_config = (install_methods_otherconfig_key, "cdrom,nfs,http,ftp") :: ("rhel6","true") :: m_a_s @ bt.vM_other_config;
-		vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ();
+		vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ~vcpus:max_vcpus ();
 	}
 
 type memory =
@@ -496,10 +498,10 @@ let hvm_linux_template
       vM_platform = platform_flags;
       vM_HVM_boot_params = [ Constants.hvm_boot_params_order, "cdn" ];
       vM_HVM_shadow_multiplier = base.vM_HVM_shadow_multiplier;
-      vM_recommendations = (recommendations ~memory:max_memory_gib ());
+      vM_recommendations = (recommendations ~memory:max_memory_gib ~fields:[("allow-gpu-passthrough", "0")] ());
       vM_generation_id = ""; 
   }
-    
+
 let sles10sp1_template name architecture ?(is_experimental=false) flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> 16
@@ -514,7 +516,7 @@ let sles10sp1_template name architecture ?(is_experimental=false) flags =
 		vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ~vifs:3 ();
 	}
 
-let sles10_template name architecture ?(is_experimental=false) flags =
+let sles10_template name architecture ?(is_experimental=false) ?(max_vcpus=32) flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> 16
 		| X64 -> 128 
@@ -525,12 +527,12 @@ let sles10_template name architecture ?(is_experimental=false) flags =
 	let bt = eli_install_template (default_memory_parameters 512L) name "sleslike" true "console=ttyS0 xencons=ttyS" in
 	{ bt with
 		vM_other_config = (install_methods_otherconfig_key, "cdrom,nfs,http,ftp") :: ("install-arch",install_arch) :: bt.vM_other_config;
-		vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ();
+		vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ~vcpus:max_vcpus ();
 	}
 
 let sles11_template = sles10_template
 
-let debian_template name release architecture ?(supports_cd=true) ?(is_experimental=false) ?(max_mem_gib=32) ?(max_vcpus=16) ?(cmdline="-- quiet console=hvc0") flags =
+let debian_template name release architecture ?(supports_cd=true) ?(is_experimental=false) ?(max_mem_gib=32) ?(max_vcpus=32) ?(cmdline="-- quiet console=hvc0") flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> max_mem_gib
 		| X64_debianlike -> max_mem_gib
@@ -576,10 +578,10 @@ let create_all_templates rpc session_id =
 		rhel6x_template "Oracle Enterprise Linux 6" X64 [    ];
 		rhel6x_template "CentOS 6" X32 [    ];
 		rhel6x_template "CentOS 6" X64 [    ];
-		hvm_linux_template "Red Hat Enterprise Linux 7" (MiB 512) (GiB 512)  (GiB 8);
+		hvm_linux_template "Red Hat Enterprise Linux 7" (GiB 1) (GiB 512)  (GiB 10);
+		hvm_linux_template "CentOS 7" (GiB 1) (GiB 512)  (GiB 10);
+		hvm_linux_template "Oracle Linux 7" (GiB 1) (GiB 512)  (GiB 10);
 		hvm_linux_template "Ubuntu Trusty Tahr 14.04" (MiB 512) (GiB 512)  (GiB 8);
-		hvm_linux_template "SUSE Linux Enterprise Server 12" ~is_experimental:true (MiB 512) (GiB 512) (GiB 8);
-
 		sles10sp1_template "SUSE Linux Enterprise Server 10 SP1" X32 [    ];
 		sles10_template    "SUSE Linux Enterprise Server 10 SP2" X32 [    ];
 		sles10_template    "SUSE Linux Enterprise Server 10 SP3" X32 [    ];
@@ -596,18 +598,20 @@ let create_all_templates rpc session_id =
 		sles11_template    "SUSE Linux Enterprise Server 11 SP1" X64 [    ];
 		sles11_template    "SUSE Linux Enterprise Server 11 SP2" X64 [    ];
 		sles11_template    "SUSE Linux Enterprise Server 11 SP3" X64 [    ];
+		sles11_template    "SUSE Linux Enterprise Server 12"     X64 [    ];
 
-		debian_template "Debian Squeeze 6.0" "squeeze" X32 ~max_vcpus:32 [    ];
-		debian_template "Debian Squeeze 6.0" "squeeze" X64_debianlike ~max_mem_gib:70 ~max_vcpus:32 [    ];
-		debian_template "Debian Wheezy 7.0" "wheezy" X32 ~max_vcpus:32 [    ];
-		debian_template "Debian Wheezy 7.0" "wheezy" X64_debianlike ~max_mem_gib:128 ~max_vcpus:32 [    ];
+ 		debian_template "Debian Squeeze 6.0" "squeeze" X32 [    ];
+ 		debian_template "Debian Squeeze 6.0" "squeeze" X64_debianlike ~max_mem_gib:70 [    ];
+		debian_template "Debian Wheezy 7.0" "wheezy" X32 [    ];
+		debian_template "Debian Wheezy 7.0" "wheezy" X64_debianlike ~max_mem_gib:128 [    ];
 
-		debian_template "Ubuntu Lucid Lynx 10.04" "lucid" X32 ~supports_cd:false [    ];
+		debian_template "Ubuntu Lucid Lynx 10.04" "lucid" X32 ~supports_cd:false ~max_vcpus:8 [    ];
 		debian_template "Ubuntu Lucid Lynx 10.04" "lucid" X64_debianlike ~supports_cd:false [    ];
-		debian_template "Ubuntu Maverick Meerkat 10.10" "maverick" X32 ~supports_cd:false ~is_experimental:true [    ];
+
+		debian_template "Ubuntu Maverick Meerkat 10.10" "maverick" X32 ~max_vcpus:8 ~supports_cd:false ~is_experimental:true [    ];
 		debian_template "Ubuntu Maverick Meerkat 10.10" "maverick" X64_debianlike ~supports_cd:false ~is_experimental:true [    ];
-		debian_template "Ubuntu Precise Pangolin 12.04" "precise" X32 ~max_mem_gib:48 ~max_vcpus:8 ~cmdline:"-- quiet console=hvc0 d-i:base-installer/kernel/image=linux-generic-pae" [    ];
-		debian_template "Ubuntu Precise Pangolin 12.04" "precise" X64_debianlike ~max_mem_gib:128 ~max_vcpus:128 [    ];
+		debian_template "Ubuntu Precise Pangolin 12.04" "precise" X32 ~max_vcpus:8 ~cmdline:"-- quiet console=hvc0 d-i:base-installer/kernel/image=linux-generic-pae" [    ];
+		debian_template "Ubuntu Precise Pangolin 12.04" "precise" X64_debianlike ~max_mem_gib:128 [    ];
 	] in
 
 	let hvm_static_templates =
