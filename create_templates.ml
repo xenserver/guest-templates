@@ -98,14 +98,13 @@ let xml_of_disk disk =
 let xml_of_disks disks = Xml.Element("provision", [], List.map xml_of_disk disks)
 
 (* template restrictions (added to recommendations field for UI) *)
-let recommendations ?(memory=128) ?(vcpus=16) ?(vbds=16) ?(vifs=7) ?(fields=[]) () =
+let recommendations ?(memory=128) ?(vcpus=16) ?(vbds=16) ?(vifs=7) () =
   let ( ** ) = Int64.mul in
     "<restrictions>"
     ^"<restriction field=\"memory-static-max\" max=\""^(Int64.to_string ((Int64.of_int memory) ** 1024L ** 1024L ** 1024L))^"\" />"
     ^"<restriction field=\"vcpus-max\" max=\""^(string_of_int vcpus)^"\" />"
     ^"<restriction property=\"number-of-vbds\" max=\""^(string_of_int vbds)^"\" />"
     ^"<restriction property=\"number-of-vifs\" max=\""^(string_of_int vifs)^"\" />"
-    ^(String.concat "" (List.map (fun (field, value) -> "<restriction field=\"" ^ field ^ "\" value=\"" ^ value ^ "\" />") fields))
     ^"</restrictions>"
 
 
@@ -498,7 +497,7 @@ let hvm_linux_template
       vM_platform = platform_flags;
       vM_HVM_boot_params = [ Constants.hvm_boot_params_order, "cdn" ];
       vM_HVM_shadow_multiplier = base.vM_HVM_shadow_multiplier;
-      vM_recommendations = (recommendations ~memory:max_memory_gib ~fields:[("allow-gpu-passthrough", "0")] ());
+      vM_recommendations = (recommendations ~memory:max_memory_gib ());
       vM_generation_id = ""; 
   }
 
