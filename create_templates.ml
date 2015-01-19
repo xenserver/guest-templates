@@ -627,6 +627,8 @@ let create_all_templates rpc session_id =
 		hvm_template "Windows 7"                  X64 2048 24 128 [n;  v;] "0002";
 		hvm_template "Windows 8"                  ~generation_id:true X32 1024 24   4 [n;v;s;] "0002";
 		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24 128 [n;v;s;] "0002";
+		hvm_template "Windows 10 Preview"         ~is_experimental:true ~generation_id:true X32 1024 24   4 [n;v;s;] "0002";
+		hvm_template "Windows 10 Preview"         ~is_experimental:true ~generation_id:true X64 2048 24 128 [n;v;s;] "0002";
 		hvm_template "Windows Server 2003"        X32  256 16  64 [    v;] "";
 		hvm_template "Windows Server 2003"        X32  256 16  64 [  x;v;] "";
 		hvm_template "Windows Server 2003"        X64  256 16 128 [n;  v;] "";
@@ -639,6 +641,7 @@ let create_all_templates rpc session_id =
 		hvm_template "Windows Server 2008 R2"     X64  512 24 128 [n;x;v;] "0002";
 		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 32 128 [n;v;s;] "0002";
 		hvm_template "Windows Server 2012 R2"     ~generation_id:true X64 1024 32 128 [n;v;s;] "0002";
+		hvm_template "Windows Server 10 Preview"  ~is_experimental:true ~generation_id:true X64 1024 32 128 [n;v;s;] "0002";
 	] in
 
 	(* put default_template key in static_templates other_config of static_templates: *)
