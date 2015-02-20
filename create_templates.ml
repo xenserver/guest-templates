@@ -192,6 +192,7 @@ let blank_template memory = {
 	vM_is_control_domain = false;
 	vM_ha_restart_priority = "";
 	vM_ha_always_run = false;
+	vM_hardware_platform_version = 0L;
 
 	(* These are ignored by the create call but required by the record type *)
 	vM_uuid = "Invalid";
