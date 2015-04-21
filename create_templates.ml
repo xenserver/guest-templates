@@ -604,6 +604,7 @@ let create_all_templates rpc session_id =
 		sles11_template    "SUSE Linux Enterprise Server 11 SP1" X64 [    ];
 		sles11_template    "SUSE Linux Enterprise Server 11 SP2" X64 [    ];
 		sles11_template    "SUSE Linux Enterprise Server 11 SP3" X64 [    ];
+		sles11_template    "SUSE Linux Enterprise Desktop 11 SP3" X64 [    ];
 		sles11_template    "SUSE Linux Enterprise Server 12"     X64 [    ];
 
  		debian_template "Debian Squeeze 6.0" "squeeze" X32 [    ];
