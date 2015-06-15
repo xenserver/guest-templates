@@ -193,6 +193,7 @@ let blank_template memory = {
 	vM_ha_restart_priority = "";
 	vM_ha_always_run = false;
 	vM_hardware_platform_version = 0L;
+	vM_auto_update_drivers = false;
 
 	(* These are ignored by the create call but required by the record type *)
 	vM_uuid = "Invalid";
@@ -315,6 +316,7 @@ type hvm_template_flags =
 	| XenApp
 	| Viridian
 	| StdVga
+	| WindowsUpdate
 
 type architecture =
 	| X32
@@ -379,6 +381,7 @@ let hvm_template
 			(if xen_app then 4.0 else base.vM_HVM_shadow_multiplier);
 		vM_recommendations = (recommendations ~memory:maximum_supported_memory_gib ());
 		vM_generation_id = if generation_id then "0:0" else "";
+		vM_auto_update_drivers = List.mem WindowsUpdate flags;
 	}
 
 (* machine-address-size key-name/value; goes in other-config of RHEL5.2 template *)
@@ -627,29 +630,30 @@ let create_all_templates rpc session_id =
 		let x = XenApp   in
 		let v = Viridian in
 		let s = StdVga   in
+		let u = WindowsUpdate in
 	[
 		other_install_media_template (default_memory_parameters 128L);
-		hvm_template "Windows XP SP3"             X32  256 16   4 [    v;] "";
-		hvm_template "Windows Vista"              X32 1024 24   4 [n;  v;] "0002";
-		hvm_template "Windows 7"                  X32 1024 24   4 [n;  v;] "0002";
-		hvm_template "Windows 7"                  X64 2048 24 128 [n;  v;] "0002";
-		hvm_template "Windows 8"                  ~generation_id:true X32 1024 24   4 [n;v;s;] "0002";
-		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24 128 [n;v;s;] "0002";
-		hvm_template "Windows 10 Preview"         ~is_experimental:true ~generation_id:true X32 1024 24   4 [n;v;s;] "0002";
-		hvm_template "Windows 10 Preview"         ~is_experimental:true ~generation_id:true X64 2048 24 128 [n;v;s;] "0002";
-		hvm_template "Windows Server 2003"        X32  256 16  64 [    v;] "";
-		hvm_template "Windows Server 2003"        X32  256 16  64 [  x;v;] "";
-		hvm_template "Windows Server 2003"        X64  256 16 128 [n;  v;] "";
-		hvm_template "Windows Server 2003"        X64  256 16 128 [n;x;v;] "";
-		hvm_template "Windows Server 2008"        X32  512 24  64 [n;  v;] "0002";
-		hvm_template "Windows Server 2008"        X32  512 24  64 [n;x;v;] "0002";
-		hvm_template "Windows Server 2008"        X64  512 24 128 [n;  v;] "0002";
-		hvm_template "Windows Server 2008"        X64  512 24 128 [n;x;v;] "0002";
-		hvm_template "Windows Server 2008 R2"     X64  512 24 128 [n;  v;] "0002";
-		hvm_template "Windows Server 2008 R2"     X64  512 24 128 [n;x;v;] "0002";
-		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 32 128 [n;v;s;] "0002";
-		hvm_template "Windows Server 2012 R2"     ~generation_id:true X64 1024 32 128 [n;v;s;] "0002";
-		hvm_template "Windows Server 10 Preview"  ~is_experimental:true ~generation_id:true X64 1024 32 128 [n;v;s;] "0002";
+		hvm_template "Windows XP SP3"             X32  256 16   4 [    v; ] "";
+		hvm_template "Windows Vista"              X32 1024 24   4 [n;  v;u] "0002";
+		hvm_template "Windows 7"                  X32 1024 24   4 [n;  v;u] "0002";
+		hvm_template "Windows 7"                  X64 2048 24 128 [n;  v;u] "0002";
+		hvm_template "Windows 8"                  ~generation_id:true X32 1024 24   4 [n;v;s;u] "0002";
+		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24 128 [n;v;s;u] "0002";
+		hvm_template "Windows 10 Preview"         ~is_experimental:true ~generation_id:true X32 1024 24   4 [n;v;s;u] "0002";
+		hvm_template "Windows 10 Preview"         ~is_experimental:true ~generation_id:true X64 2048 24 128 [n;v;s;u] "0002";
+		hvm_template "Windows Server 2003"        X32  256 16  64 [    v; ] "";
+		hvm_template "Windows Server 2003"        X32  256 16  64 [  x;v; ] "";
+		hvm_template "Windows Server 2003"        X64  256 16 128 [n;  v; ] "";
+		hvm_template "Windows Server 2003"        X64  256 16 128 [n;x;v; ] "";
+		hvm_template "Windows Server 2008"        X32  512 24  64 [n;  v;u] "0002";
+		hvm_template "Windows Server 2008"        X32  512 24  64 [n;x;v;u] "0002";
+		hvm_template "Windows Server 2008"        X64  512 24 128 [n;  v;u] "0002";
+		hvm_template "Windows Server 2008"        X64  512 24 128 [n;x;v;u] "0002";
+		hvm_template "Windows Server 2008 R2"     X64  512 24 128 [n;  v;u] "0002";
+		hvm_template "Windows Server 2008 R2"     X64  512 24 128 [n;x;v;u] "0002";
+		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 32 128 [n;v;s;u] "0002";
+		hvm_template "Windows Server 2012 R2"     ~generation_id:true X64 1024 32 128 [n;v;s;u] "0002";
+		hvm_template "Windows Server 10 Preview"  ~is_experimental:true ~generation_id:true X64 1024 32 128 [n;v;s;u] "0002";
 	] in
 
 	(* put default_template key in static_templates other_config of static_templates: *)
