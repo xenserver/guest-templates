@@ -502,7 +502,7 @@ let hvm_linux_template
       vM_platform = platform_flags;
       vM_HVM_boot_params = [ Constants.hvm_boot_params_order, "cdn" ];
       vM_HVM_shadow_multiplier = base.vM_HVM_shadow_multiplier;
-      vM_recommendations = (recommendations ~memory:max_memory_gib ~fields:[("allow-gpu-passthrough", "1"); ("allow-vgpu", "0")] ());
+      vM_recommendations = (recommendations ~memory:max_memory_gib ~fields:[("allow-gpu-passthrough", "1"); ("allow-vgpu", "1")] ());
       vM_generation_id = ""; 
   }
 
