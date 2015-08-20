@@ -536,6 +536,19 @@ let sles10_template name architecture ?(is_experimental=false) ?(max_vcpus=32) f
 
 let sles11_template = sles10_template
 
+let sles12_template name architecture ?(is_experimental=false) ?(max_vcpus=32) flags =
+        let maximum_supported_memory_gib = match architecture with
+                | X32 -> 16
+                | X64 -> 128
+                | X64_debianlike -> assert false
+        in
+        let name = make_long_name name architecture is_experimental in
+        let install_arch = technical_string_of_architecture architecture in
+        let bt = eli_install_template (default_memory_parameters 512L) name "sleslike" true "console=xvc0 xencons=xvc" in
+        { bt with
+                vM_other_config = (install_methods_otherconfig_key, "cdrom,nfs,http,ftp") :: ("install-arch",install_arch) :: bt.vM_other_config;
+                vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ~vcpus:max_vcpus ();
+
 let debian_template name release architecture ?(supports_cd=true) ?(is_experimental=false) ?(max_mem_gib=32) ?(max_vcpus=32) ?(cmdline="-- quiet console=hvc0") flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> max_mem_gib
@@ -610,8 +623,8 @@ let create_all_templates rpc session_id =
 		sles11_template    "SUSE Linux Enterprise Server 11 SP2" X64 [    ];
 		sles11_template    "SUSE Linux Enterprise Server 11 SP3" X64 [    ];
 		sles11_template    "SUSE Linux Enterprise Desktop 11 SP3" X64 [    ];
-		sles11_template    "SUSE Linux Enterprise Server 12"     X64 [    ];
-		sles11_template    "SUSE Linux Enterprise Desktop 12" X64 [    ];
+		sles12_template    "SUSE Linux Enterprise Server 12"     X64 [    ];
+		sles12_template    "SUSE Linux Enterprise Desktop 12" X64 [    ];
 
  		debian_template "Debian Squeeze 6.0" "squeeze" X32 [    ];
  		debian_template "Debian Squeeze 6.0" "squeeze" X64_debianlike ~max_mem_gib:70 [    ];
