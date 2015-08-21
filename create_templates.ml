@@ -548,6 +548,7 @@ let sles12_template name architecture ?(is_experimental=false) ?(max_vcpus=32) f
         { bt with
                 vM_other_config = (install_methods_otherconfig_key, "cdrom,nfs,http,ftp") :: ("install-arch",install_arch) :: bt.vM_other_config;
                 vM_recommendations = recommendations ~memory:maximum_supported_memory_gib ~vcpus:max_vcpus ();
+        }
 
 let debian_template name release architecture ?(supports_cd=true) ?(is_experimental=false) ?(max_mem_gib=32) ?(max_vcpus=32) ?(cmdline="-- quiet console=hvc0") flags =
 	let maximum_supported_memory_gib = match architecture with
