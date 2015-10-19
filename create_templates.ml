@@ -656,8 +656,8 @@ let create_all_templates rpc session_id =
 		hvm_template "Windows 7"                  X64 2048 24 128 [n;  v;u] "0002";
 		hvm_template "Windows 8"                  ~generation_id:true X32 1024 24   4 [n;v;s;u] "0002";
 		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24 128 [n;v;s;u] "0002";
-		hvm_template "Windows 10 Preview"         ~is_experimental:true ~generation_id:true X32 1024 24   4 [n;v;s;u] "0002";
-		hvm_template "Windows 10 Preview"         ~is_experimental:true ~generation_id:true X64 2048 24 128 [n;v;s;u] "0002";
+		hvm_template "Windows 10"                 ~generation_id:true X32 1024 24   4 [n;v;s;u] "0002";
+		hvm_template "Windows 10"                 ~generation_id:true X64 2048 24 128 [n;v;s;u] "0002";
 		hvm_template "Windows Server 2003"        X32  256 16  64 [    v; ] "";
 		hvm_template "Windows Server 2003"        X32  256 16  64 [  x;v; ] "";
 		hvm_template "Windows Server 2003"        X64  256 16 128 [n;  v; ] "";
