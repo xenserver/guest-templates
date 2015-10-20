@@ -99,7 +99,7 @@ let xml_of_disk disk =
 let xml_of_disks disks = Xml.Element("provision", [], List.map xml_of_disk disks)
 
 (* template restrictions (added to recommendations field for UI) *)
-let recommendations ?(memory=128) ?(vcpus=16) ?(vbds=16) ?(vifs=7) ?(fields=[]) () =
+let recommendations ?(memory=128) ?(vcpus=16) ?(vbds=255) ?(vifs=7) ?(fields=[]) () =
   let ( ** ) = Int64.mul in
     "<restrictions>"
     ^"<restriction field=\"memory-static-max\" max=\""^(Int64.to_string ((Int64.of_int memory) ** 1024L ** 1024L ** 1024L))^"\" />"
