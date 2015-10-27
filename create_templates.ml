@@ -118,7 +118,12 @@ let find_or_create_template x rpc session_id =
   let all = List.filter (fun self -> Client.VM.get_is_a_template rpc session_id self) all in
   let all = List.filter (fun self -> List.mem default_template (Client.VM.get_other_config rpc session_id self)) all in
   if all = []
-  then Client.VM.create_from_record rpc session_id x
+  then begin 
+      let newvm = Client.VM.create_from_record rpc session_id x in
+      if x.vM_auto_update_drivers then
+        Client.VM.set_auto_update_drivers rpc session_id newvm x.vM_auto_update_drivers;
+      newvm
+  end
   else List.hd all
 
 let version_of_tools_vdi rpc session_id vdi =
