@@ -75,6 +75,9 @@ let disks_key = "disks"
 (** The key name pointing to the post-install script *)
 let post_install_key = "postinstall"
 
+(** The Xen Platform PCI Device [5853:0001] *)
+let xen_device_id = "0001"
+
 (** This type should never be modified. If you want to extend it, then
     we should do this some other way e.g. by using VDI.create directly. *)
 type disk = { device: string; (** device inside the guest eg xvda *)
@@ -489,7 +492,7 @@ let hvm_linux_template
     @ (["vga","std";"videoram","8"])
     @ [nx_flag]
     @ (["viridian", "false"])
-    @ ([ "device_id", "0001" ])
+    @ ([ "device_id", xen_device_id ])
   in
   let max_memory_gib = to_gib max_memory in
   {
