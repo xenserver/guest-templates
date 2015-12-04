@@ -101,9 +101,10 @@ let xml_of_disk disk =
 	], [])
 let xml_of_disks disks = Xml.Element("provision", [], List.map xml_of_disk disks)
 
-(* template restrictions (added to recommendations field for UI) *)
-let recommendations ?(memory=128) ?(vcpus=16) ?(vbds=255) ?(vifs=7) ?(fields=[]) () =
+(* template restrictions (added to recommendations field for clients, especially UI clients) *)
+let recommendations ?(memory=128) ?(vcpus=16) ?(vbds=255) ?(vifs=7) ?(fields=[]) ?(has_vendor_device=false) () =
   let ( ** ) = Int64.mul in
+  let fields = ("has-vendor-device", string_of_bool has_vendor_device) :: fields in
     "<restrictions>"
     ^"<restriction field=\"memory-static-max\" max=\""^(Int64.to_string ((Int64.of_int memory) ** 1024L ** 1024L ** 1024L))^"\" />"
     ^"<restriction field=\"vcpus-max\" max=\""^(string_of_int vcpus)^"\" />"
@@ -111,7 +112,6 @@ let recommendations ?(memory=128) ?(vcpus=16) ?(vbds=255) ?(vifs=7) ?(fields=[])
     ^"<restriction property=\"number-of-vifs\" max=\""^(string_of_int vifs)^"\" />"
     ^(String.concat "" (List.map (fun (field, value) -> "<restriction field=\"" ^ field ^ "\" value=\"" ^ value ^ "\" />") fields))
     ^"</restrictions>"
-
 
 open Client
 
@@ -198,6 +198,7 @@ let blank_template memory = {
 	vM_ha_always_run = false;
 	vM_hardware_platform_version = 0L;
 	vM_auto_update_drivers = false;
+	vM_has_vendor_device = false;
 
 	(* These are ignored by the create call but required by the record type *)
 	vM_uuid = "Invalid";
@@ -320,7 +321,7 @@ type hvm_template_flags =
 	| XenApp
 	| Viridian
 	| StdVga
-	| WindowsUpdate
+	| VendorDevice
 
 type architecture =
 	| X32
@@ -383,9 +384,8 @@ let hvm_template
 			else no_nx_flag :: platform_flags);
 		vM_HVM_shadow_multiplier =
 			(if xen_app then 4.0 else base.vM_HVM_shadow_multiplier);
-		vM_recommendations = (recommendations ~memory:maximum_supported_memory_gib ());
+		vM_recommendations = (recommendations ~memory:maximum_supported_memory_gib ~has_vendor_device:(List.mem VendorDevice flags) ());
 		vM_generation_id = if generation_id then "0:0" else "";
-		vM_auto_update_drivers = List.mem WindowsUpdate flags;
 	}
 
 (* machine-address-size key-name/value; goes in other-config of RHEL5.2 template *)
@@ -650,30 +650,30 @@ let create_all_templates rpc session_id =
 		let x = XenApp   in
 		let v = Viridian in
 		let s = StdVga   in
-		let u = WindowsUpdate in
+		let d = VendorDevice in
 	[
 		other_install_media_template (default_memory_parameters 128L);
 		hvm_template "Windows XP SP3"             X32  256 16   4 [    v; ] "";
-		hvm_template "Windows Vista"              X32 1024 24   4 [n;  v;u] xen_device_id;
-		hvm_template "Windows 7"                  X32 1024 24   4 [n;  v;u] xen_device_id;
-		hvm_template "Windows 7"                  X64 2048 24 128 [n;  v;u] xen_device_id;
-		hvm_template "Windows 8"                  ~generation_id:true X32 1024 24   4 [n;v;s;u] xen_device_id;
-		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24 128 [n;v;s;u] xen_device_id;
-		hvm_template "Windows 10"                 ~generation_id:true X32 1024 24   4 [n;v;s;u] xen_device_id;
-		hvm_template "Windows 10"                 ~generation_id:true X64 2048 24 128 [n;v;s;u] xen_device_id;
+		hvm_template "Windows Vista"              X32 1024 24   4 [n;  v;d] xen_device_id;
+		hvm_template "Windows 7"                  X32 1024 24   4 [n;  v;d] xen_device_id;
+		hvm_template "Windows 7"                  X64 2048 24 128 [n;  v;d] xen_device_id;
+		hvm_template "Windows 8"                  ~generation_id:true X32 1024 24   4 [n;v;s;d] xen_device_id;
+		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24 128 [n;v;s;d] xen_device_id;
+		hvm_template "Windows 10"                 ~generation_id:true X32 1024 24   4 [n;v;s;d] xen_device_id;
+		hvm_template "Windows 10"                 ~generation_id:true X64 2048 24 128 [n;v;s;d] xen_device_id;
 		hvm_template "Windows Server 2003"        X32  256 16  64 [    v; ] "";
 		hvm_template "Windows Server 2003"        X32  256 16  64 [  x;v; ] "";
 		hvm_template "Windows Server 2003"        X64  256 16 128 [n;  v; ] "";
 		hvm_template "Windows Server 2003"        X64  256 16 128 [n;x;v; ] "";
-		hvm_template "Windows Server 2008"        X32  512 24  64 [n;  v;u] xen_device_id;
-		hvm_template "Windows Server 2008"        X32  512 24  64 [n;x;v;u] xen_device_id;
-		hvm_template "Windows Server 2008"        X64  512 24 1000 [n;  v;u] xen_device_id;
-		hvm_template "Windows Server 2008"        X64  512 24 1000 [n;x;v;u] xen_device_id;
-		hvm_template "Windows Server 2008 R2"     X64  512 24 1500 [n;  v;u] xen_device_id;
-		hvm_template "Windows Server 2008 R2"     X64  512 24 1500 [n;x;v;u] xen_device_id;
-		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 32 1500 [n;v;s;u] xen_device_id;
-		hvm_template "Windows Server 2012 R2"     ~generation_id:true X64 1024 32 1500 [n;v;s;u] xen_device_id;
-		hvm_template "Windows Server 10 Preview"  ~is_experimental:true ~generation_id:true X64 1024 32 1500 [n;v;s;u] xen_device_id;
+		hvm_template "Windows Server 2008"        X32  512 24  64 [n;  v;d] xen_device_id;
+		hvm_template "Windows Server 2008"        X32  512 24  64 [n;x;v;d] xen_device_id;
+		hvm_template "Windows Server 2008"        X64  512 24 1000 [n;  v;d] xen_device_id;
+		hvm_template "Windows Server 2008"        X64  512 24 1000 [n;x;v;d] xen_device_id;
+		hvm_template "Windows Server 2008 R2"     X64  512 24 1500 [n;  v;d] xen_device_id;
+		hvm_template "Windows Server 2008 R2"     X64  512 24 1500 [n;x;v;d] xen_device_id;
+		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 32 1500 [n;v;s;d] xen_device_id;
+		hvm_template "Windows Server 2012 R2"     ~generation_id:true X64 1024 32 1500 [n;v;s;d] xen_device_id;
+		hvm_template "Windows Server 10 Preview"  ~is_experimental:true ~generation_id:true X64 1024 32 1500 [n;v;s;d] xen_device_id;
 	] in
 
 	(* put default_template key in static_templates other_config of static_templates: *)
