@@ -102,7 +102,7 @@ let xml_of_disk disk =
 let xml_of_disks disks = Xml.Element("provision", [], List.map xml_of_disk disks)
 
 (* template restrictions (added to recommendations field for clients, especially UI clients) *)
-let recommendations ?(memory=128) ?(vcpus=16) ?(vbds=255) ?(vifs=7) ?(fields=[]) ?(has_vendor_device=false) () =
+let recommendations ?(memory=128) ?(vcpus=32) ?(vbds=255) ?(vifs=7) ?(fields=[]) ?(has_vendor_device=false) () =
   let ( ** ) = Int64.mul in
   let fields = ("has-vendor-device", string_of_bool has_vendor_device) :: fields in
     "<restrictions>"
