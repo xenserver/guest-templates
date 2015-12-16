@@ -75,6 +75,9 @@ let disks_key = "disks"
 (** The key name pointing to the post-install script *)
 let post_install_key = "postinstall"
 
+(** The Xen Platform PCI Device [5853:0001] *)
+let xen_device_id = "0001"
+
 (** This type should never be modified. If you want to extend it, then
     we should do this some other way e.g. by using VDI.create directly. *)
 type disk = { device: string; (** device inside the guest eg xvda *)
@@ -98,9 +101,10 @@ let xml_of_disk disk =
 	], [])
 let xml_of_disks disks = Xml.Element("provision", [], List.map xml_of_disk disks)
 
-(* template restrictions (added to recommendations field for UI) *)
-let recommendations ?(memory=128) ?(vcpus=16) ?(vbds=255) ?(vifs=7) ?(fields=[]) () =
+(* template restrictions (added to recommendations field for clients, especially UI clients) *)
+let recommendations ?(memory=128) ?(vcpus=16) ?(vbds=255) ?(vifs=7) ?(fields=[]) ?(has_vendor_device=false) () =
   let ( ** ) = Int64.mul in
+  let fields = ("has-vendor-device", string_of_bool has_vendor_device) :: fields in
     "<restrictions>"
     ^"<restriction field=\"memory-static-max\" max=\""^(Int64.to_string ((Int64.of_int memory) ** 1024L ** 1024L ** 1024L))^"\" />"
     ^"<restriction field=\"vcpus-max\" max=\""^(string_of_int vcpus)^"\" />"
@@ -108,7 +112,6 @@ let recommendations ?(memory=128) ?(vcpus=16) ?(vbds=255) ?(vifs=7) ?(fields=[])
     ^"<restriction property=\"number-of-vifs\" max=\""^(string_of_int vifs)^"\" />"
     ^(String.concat "" (List.map (fun (field, value) -> "<restriction field=\"" ^ field ^ "\" value=\"" ^ value ^ "\" />") fields))
     ^"</restrictions>"
-
 
 open Client
 
@@ -195,6 +198,7 @@ let blank_template memory = {
 	vM_ha_always_run = false;
 	vM_hardware_platform_version = 0L;
 	vM_auto_update_drivers = false;
+	vM_has_vendor_device = false;
 
 	(* These are ignored by the create call but required by the record type *)
 	vM_uuid = "Invalid";
@@ -317,7 +321,7 @@ type hvm_template_flags =
 	| XenApp
 	| Viridian
 	| StdVga
-	| WindowsUpdate
+	| VendorDevice
 
 type architecture =
 	| X32
@@ -380,9 +384,8 @@ let hvm_template
 			else no_nx_flag :: platform_flags);
 		vM_HVM_shadow_multiplier =
 			(if xen_app then 4.0 else base.vM_HVM_shadow_multiplier);
-		vM_recommendations = (recommendations ~memory:maximum_supported_memory_gib ());
+		vM_recommendations = (recommendations ~memory:maximum_supported_memory_gib ~has_vendor_device:(List.mem VendorDevice flags) ());
 		vM_generation_id = if generation_id then "0:0" else "";
-		vM_auto_update_drivers = List.mem WindowsUpdate flags;
 	}
 
 (* machine-address-size key-name/value; goes in other-config of RHEL5.2 template *)
@@ -489,7 +492,7 @@ let hvm_linux_template
     @ (["vga","std";"videoram","8"])
     @ [nx_flag]
     @ (["viridian", "false"])
-    @ ([ "device_id", "0001" ])
+    @ ([ "device_id", xen_device_id ])
   in
   let max_memory_gib = to_gib max_memory in
   {
@@ -601,13 +604,13 @@ let create_all_templates rpc session_id =
 		rhel6x_template "CentOS 6" X64 [    ];
 		rhel6x_template "Scientific Linux 6" X32 [    ];
 		rhel6x_template "Scientific Linux 6" X64 [    ];
-		hvm_linux_template "Red Hat Enterprise Linux 7" (GiB 1) (GiB 512)  (GiB 10);
-		hvm_linux_template "CentOS 7" (GiB 1) (GiB 512)  (GiB 10);
-		hvm_linux_template "Oracle Linux 7" (GiB 1) (GiB 512)  (GiB 10);
-		hvm_linux_template "Scientific Linux 7" (GiB 1) (GiB 512)  (GiB 10);
-		hvm_linux_template "Ubuntu Trusty Tahr 14.04" (MiB 512) (GiB 512)  (GiB 8);
+		hvm_linux_template "Red Hat Enterprise Linux 7" (GiB 1) (GiB 1500)  (GiB 10);
+		hvm_linux_template "CentOS 7" (GiB 1) (GiB 1500)  (GiB 10);
+		hvm_linux_template "Oracle Linux 7" (GiB 1) (GiB 1500)  (GiB 10);
+		hvm_linux_template "Scientific Linux 7" (GiB 1) (GiB 1500)  (GiB 10);
+		hvm_linux_template "Ubuntu Trusty Tahr 14.04" (MiB 512) (GiB 1500)  (GiB 8);
 		hvm_linux_template "CoreOS" (MiB 512) (GiB 512) (GiB 5);
-		hvm_linux_template "Debian Jessie 8.0" (MiB 128) (GiB 512)  (GiB 8);
+		hvm_linux_template "Debian Jessie 8.0" (MiB 128) (GiB 1500)  (GiB 8);
 		sles10sp1_template "SUSE Linux Enterprise Server 10 SP1" X32 [    ];
 		sles10_template    "SUSE Linux Enterprise Server 10 SP2" X32 [    ];
 		sles10_template    "SUSE Linux Enterprise Server 10 SP3" X32 [    ];
@@ -647,30 +650,30 @@ let create_all_templates rpc session_id =
 		let x = XenApp   in
 		let v = Viridian in
 		let s = StdVga   in
-		let u = WindowsUpdate in
+		let d = VendorDevice in
 	[
 		other_install_media_template (default_memory_parameters 128L);
 		hvm_template "Windows XP SP3"             X32  256 16   4 [    v; ] "";
-		hvm_template "Windows Vista"              X32 1024 24   4 [n;  v;u] "0002";
-		hvm_template "Windows 7"                  X32 1024 24   4 [n;  v;u] "0002";
-		hvm_template "Windows 7"                  X64 2048 24 128 [n;  v;u] "0002";
-		hvm_template "Windows 8"                  ~generation_id:true X32 1024 24   4 [n;v;s;u] "0002";
-		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24 128 [n;v;s;u] "0002";
-		hvm_template "Windows 10"                 ~generation_id:true X32 1024 24   4 [n;v;s;u] "0002";
-		hvm_template "Windows 10"                 ~generation_id:true X64 2048 24 128 [n;v;s;u] "0002";
+		hvm_template "Windows Vista"              X32 1024 24   4 [n;  v;d] xen_device_id;
+		hvm_template "Windows 7"                  X32 1024 24   4 [n;  v;d] xen_device_id;
+		hvm_template "Windows 7"                  X64 2048 24 128 [n;  v;d] xen_device_id;
+		hvm_template "Windows 8"                  ~generation_id:true X32 1024 24   4 [n;v;s;d] xen_device_id;
+		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24 128 [n;v;s;d] xen_device_id;
+		hvm_template "Windows 10"                 ~generation_id:true X32 1024 24   4 [n;v;s;d] xen_device_id;
+		hvm_template "Windows 10"                 ~generation_id:true X64 2048 24 128 [n;v;s;d] xen_device_id;
 		hvm_template "Windows Server 2003"        X32  256 16  64 [    v; ] "";
 		hvm_template "Windows Server 2003"        X32  256 16  64 [  x;v; ] "";
 		hvm_template "Windows Server 2003"        X64  256 16 128 [n;  v; ] "";
 		hvm_template "Windows Server 2003"        X64  256 16 128 [n;x;v; ] "";
-		hvm_template "Windows Server 2008"        X32  512 24  64 [n;  v;u] "0002";
-		hvm_template "Windows Server 2008"        X32  512 24  64 [n;x;v;u] "0002";
-		hvm_template "Windows Server 2008"        X64  512 24 128 [n;  v;u] "0002";
-		hvm_template "Windows Server 2008"        X64  512 24 128 [n;x;v;u] "0002";
-		hvm_template "Windows Server 2008 R2"     X64  512 24 128 [n;  v;u] "0002";
-		hvm_template "Windows Server 2008 R2"     X64  512 24 128 [n;x;v;u] "0002";
-		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 32 128 [n;v;s;u] "0002";
-		hvm_template "Windows Server 2012 R2"     ~generation_id:true X64 1024 32 128 [n;v;s;u] "0002";
-		hvm_template "Windows Server 10 Preview"  ~is_experimental:true ~generation_id:true X64 1024 32 128 [n;v;s;u] "0002";
+		hvm_template "Windows Server 2008"        X32  512 24  64 [n;  v;d] xen_device_id;
+		hvm_template "Windows Server 2008"        X32  512 24  64 [n;x;v;d] xen_device_id;
+		hvm_template "Windows Server 2008"        X64  512 24 1000 [n;  v;d] xen_device_id;
+		hvm_template "Windows Server 2008"        X64  512 24 1000 [n;x;v;d] xen_device_id;
+		hvm_template "Windows Server 2008 R2"     X64  512 24 1500 [n;  v;d] xen_device_id;
+		hvm_template "Windows Server 2008 R2"     X64  512 24 1500 [n;x;v;d] xen_device_id;
+		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 32 1500 [n;v;s;d] xen_device_id;
+		hvm_template "Windows Server 2012 R2"     ~generation_id:true X64 1024 32 1500 [n;v;s;d] xen_device_id;
+		hvm_template "Windows Server 10 Preview"  ~is_experimental:true ~generation_id:true X64 1024 32 1500 [n;v;s;d] xen_device_id;
 	] in
 
 	(* put default_template key in static_templates other_config of static_templates: *)
