@@ -197,7 +197,6 @@ let blank_template memory = {
 	vM_ha_restart_priority = "";
 	vM_ha_always_run = false;
 	vM_hardware_platform_version = 0L;
-	vM_auto_update_drivers = false;
 	vM_has_vendor_device = false;
 
 	(* These are ignored by the create call but required by the record type *)
