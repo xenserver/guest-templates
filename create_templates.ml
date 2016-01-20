@@ -78,6 +78,8 @@ let post_install_key = "postinstall"
 (** The Xen Platform PCI Device [5853:0001] *)
 let xen_device_id = "0001"
 
+let xenSERVER_device_id = "0002"
+
 (** This type should never be modified. If you want to extend it, then
     we should do this some other way e.g. by using VDI.create directly. *)
 type disk = { device: string; (** device inside the guest eg xvda *)
@@ -102,7 +104,7 @@ let xml_of_disk disk =
 let xml_of_disks disks = Xml.Element("provision", [], List.map xml_of_disk disks)
 
 (* template restrictions (added to recommendations field for clients, especially UI clients) *)
-let recommendations ?(memory=128) ?(vcpus=16) ?(vbds=255) ?(vifs=7) ?(fields=[]) ?(has_vendor_device=false) () =
+let recommendations ?(memory=128) ?(vcpus=32) ?(vbds=255) ?(vifs=7) ?(fields=[]) ?(has_vendor_device=false) () =
   let ( ** ) = Int64.mul in
   let fields = ("has-vendor-device", string_of_bool has_vendor_device) :: fields in
     "<restrictions>"
@@ -197,7 +199,6 @@ let blank_template memory = {
 	vM_ha_restart_priority = "";
 	vM_ha_always_run = false;
 	vM_hardware_platform_version = 0L;
-	vM_auto_update_drivers = false;
 	vM_has_vendor_device = false;
 
 	(* These are ignored by the create call but required by the record type *)
@@ -630,6 +631,8 @@ let create_all_templates rpc session_id =
 		sles11_template    "SUSE Linux Enterprise Desktop 11 SP3" X64 [    ];
 		sles12_template    "SUSE Linux Enterprise Server 12"     X64 [    ];
 		sles12_template    "SUSE Linux Enterprise Desktop 12" X64 [    ];
+		sles12_template    "SUSE Linux Enterprise Server 12 SP1" X64 [    ];
+		sles12_template    "SUSE Linux Enterprise Desktop 12 SP1" X64 [    ];
 
  		debian_template "Debian Squeeze 6.0" "squeeze" X32 [    ];
  		debian_template "Debian Squeeze 6.0" "squeeze" X64_debianlike ~max_mem_gib:70 [    ];
@@ -654,26 +657,26 @@ let create_all_templates rpc session_id =
 	[
 		other_install_media_template (default_memory_parameters 128L);
 		hvm_template "Windows XP SP3"             X32  256 16   4 [    v; ] "";
-		hvm_template "Windows Vista"              X32 1024 24   4 [n;  v;d] xen_device_id;
-		hvm_template "Windows 7"                  X32 1024 24   4 [n;  v;d] xen_device_id;
-		hvm_template "Windows 7"                  X64 2048 24 128 [n;  v;d] xen_device_id;
-		hvm_template "Windows 8"                  ~generation_id:true X32 1024 24   4 [n;v;s;d] xen_device_id;
-		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24 128 [n;v;s;d] xen_device_id;
-		hvm_template "Windows 10"                 ~generation_id:true X32 1024 24   4 [n;v;s;d] xen_device_id;
-		hvm_template "Windows 10"                 ~generation_id:true X64 2048 24 128 [n;v;s;d] xen_device_id;
+		hvm_template "Windows Vista"              X32 1024 24   4 [n;  v;d] xenSERVER_device_id;
+		hvm_template "Windows 7"                  X32 1024 24   4 [n;  v;d] xenSERVER_device_id;
+		hvm_template "Windows 7"                  X64 2048 24 128 [n;  v;d] xenSERVER_device_id;
+		hvm_template "Windows 8"                  ~generation_id:true X32 1024 24   4 [n;v;s;d] xenSERVER_device_id;
+		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24 128 [n;v;s;d] xenSERVER_device_id;
+		hvm_template "Windows 10"                 ~generation_id:true X32 1024 24   4 [n;v;s;d] xenSERVER_device_id;
+		hvm_template "Windows 10"                 ~generation_id:true X64 2048 24 128 [n;v;s;d] xenSERVER_device_id;
 		hvm_template "Windows Server 2003"        X32  256 16  64 [    v; ] "";
 		hvm_template "Windows Server 2003"        X32  256 16  64 [  x;v; ] "";
 		hvm_template "Windows Server 2003"        X64  256 16 128 [n;  v; ] "";
 		hvm_template "Windows Server 2003"        X64  256 16 128 [n;x;v; ] "";
-		hvm_template "Windows Server 2008"        X32  512 24  64 [n;  v;d] xen_device_id;
-		hvm_template "Windows Server 2008"        X32  512 24  64 [n;x;v;d] xen_device_id;
-		hvm_template "Windows Server 2008"        X64  512 24 1000 [n;  v;d] xen_device_id;
-		hvm_template "Windows Server 2008"        X64  512 24 1000 [n;x;v;d] xen_device_id;
-		hvm_template "Windows Server 2008 R2"     X64  512 24 1500 [n;  v;d] xen_device_id;
-		hvm_template "Windows Server 2008 R2"     X64  512 24 1500 [n;x;v;d] xen_device_id;
-		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 32 1500 [n;v;s;d] xen_device_id;
-		hvm_template "Windows Server 2012 R2"     ~generation_id:true X64 1024 32 1500 [n;v;s;d] xen_device_id;
-		hvm_template "Windows Server 10 Preview"  ~is_experimental:true ~generation_id:true X64 1024 32 1500 [n;v;s;d] xen_device_id;
+		hvm_template "Windows Server 2008"        X32  512 24  64 [n;  v;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2008"        X32  512 24  64 [n;x;v;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2008"        X64  512 24 1000 [n;  v;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2008"        X64  512 24 1000 [n;x;v;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2008 R2"     X64  512 24 1500 [n;  v;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2008 R2"     X64  512 24 1500 [n;x;v;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 32 1500 [n;v;s;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2012 R2"     ~generation_id:true X64 1024 32 1500 [n;v;s;d] xenSERVER_device_id;
+		hvm_template "Windows Server 10 Preview"  ~is_experimental:true ~generation_id:true X64 1024 32 1500 [n;v;s;d] xenSERVER_device_id;
 	] in
 
 	(* put default_template key in static_templates other_config of static_templates: *)
