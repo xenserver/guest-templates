@@ -403,7 +403,7 @@ let rhel4x_template name architecture ?(is_experimental=false) flags =
 		if List.mem Limit_machine_address_size flags
 		then [(machine_address_size_key_name, machine_address_size_key_value)]
 		else [] in
-	let bt = eli_install_template (default_memory_parameters 256L) name "rhlike" true "graphical utf8" in
+	let bt = eli_install_template (default_memory_parameters 256L) name "rhlike" true "console=xvc0 graphical utf8" in
 	{ bt with
 		vM_other_config = (install_methods_otherconfig_key, "cdrom,nfs,http,ftp") :: m_a_s @ s_s_p_f @ bt.vM_other_config;
 		vM_recommendations = recommendations ~memory:16 ~vifs:3 ();
