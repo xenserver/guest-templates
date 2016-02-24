@@ -610,6 +610,7 @@ let create_all_templates rpc session_id =
 		hvm_linux_template "Oracle Linux 7" (GiB 1) (GiB 1500)  (GiB 10);
 		hvm_linux_template "Scientific Linux 7" (GiB 1) (GiB 1500)  (GiB 10);
 		hvm_linux_template "Ubuntu Trusty Tahr 14.04" (MiB 512) (GiB 1500)  (GiB 8);
+		hvm_linux_template "Ubuntu Xenial Xerus 16.04" (MiB 512) (GiB 1500)  (GiB 10);
 		hvm_linux_template "CoreOS" (MiB 512) (GiB 512) (GiB 5);
 		hvm_linux_template "Debian Jessie 8.0" (MiB 128) (GiB 1500)  (GiB 8);
 		sles10sp1_template "SUSE Linux Enterprise Server 10 SP1" X32 [    ];
