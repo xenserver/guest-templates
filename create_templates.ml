@@ -657,7 +657,6 @@ let create_all_templates rpc session_id =
 		let d = VendorDevice in
 	[
 		other_install_media_template (default_memory_parameters 128L);
-		hvm_template "Windows XP SP3"             X32  256 16   4 [    v; ] "";
 		hvm_template "Windows Vista"              X32 1024 24   4 [n;  v;d] xenSERVER_device_id;
 		hvm_template "Windows 7"                  X32 1024 24   4 [n;  v;d] xenSERVER_device_id;
 		hvm_template "Windows 7"                  X64 2048 24 128 [n;  v;d] xenSERVER_device_id;
@@ -665,10 +664,6 @@ let create_all_templates rpc session_id =
 		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24 128 [n;v;s;d] xenSERVER_device_id;
 		hvm_template "Windows 10"                 ~generation_id:true X32 1024 24   4 [n;v;s;d] xenSERVER_device_id;
 		hvm_template "Windows 10"                 ~generation_id:true X64 2048 24 128 [n;v;s;d] xenSERVER_device_id;
-		hvm_template "Windows Server 2003"        X32  256 16  64 [    v; ] "";
-		hvm_template "Windows Server 2003"        X32  256 16  64 [  x;v; ] "";
-		hvm_template "Windows Server 2003"        X64  256 16 128 [n;  v; ] "";
-		hvm_template "Windows Server 2003"        X64  256 16 128 [n;x;v; ] "";
 		hvm_template "Windows Server 2008"        X32  512 24  64 [n;  v;d] xenSERVER_device_id;
 		hvm_template "Windows Server 2008"        X32  512 24  64 [n;x;v;d] xenSERVER_device_id;
 		hvm_template "Windows Server 2008"        X64  512 24 1000 [n;  v;d] xenSERVER_device_id;
