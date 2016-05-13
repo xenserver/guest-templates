@@ -412,7 +412,7 @@ let rhel4x_template name architecture ?(is_experimental=false) flags =
 let rhel5x_template name architecture ?(is_experimental=false) ?(max_vcpus=32) flags =
 	let maximum_supported_memory_gib = match architecture with
 		| X32 -> 16
-		| X64 -> 16
+		| X64 -> 128
 		| X64_debianlike -> assert false
 	in
 	let name = make_long_name name architecture is_experimental in
@@ -605,14 +605,14 @@ let create_all_templates rpc session_id =
 		rhel6x_template "CentOS 6" X64 [    ];
 		rhel6x_template "Scientific Linux 6" X32 [    ];
 		rhel6x_template "Scientific Linux 6" X64 [    ];
-		hvm_linux_template "Red Hat Enterprise Linux 7" (GiB 1) (GiB 1500)  (GiB 10);
-		hvm_linux_template "CentOS 7" (GiB 1) (GiB 1500)  (GiB 10);
-		hvm_linux_template "Oracle Linux 7" (GiB 1) (GiB 1500)  (GiB 10);
-		hvm_linux_template "Scientific Linux 7" (GiB 1) (GiB 1500)  (GiB 10);
-		hvm_linux_template "Ubuntu Trusty Tahr 14.04" (MiB 512) (GiB 1500)  (GiB 8);
-		hvm_linux_template "Ubuntu Xenial Xerus 16.04" (MiB 512) (GiB 1500)  (GiB 10);
+		hvm_linux_template "Red Hat Enterprise Linux 7" (GiB 1) (GiB 1536)  (GiB 10);
+		hvm_linux_template "CentOS 7" (GiB 1) (GiB 1536)  (GiB 10);
+		hvm_linux_template "Oracle Linux 7" (GiB 1) (GiB 1536)  (GiB 10);
+		hvm_linux_template "Scientific Linux 7" (GiB 1) (GiB 1536)  (GiB 10);
+		hvm_linux_template "Ubuntu Trusty Tahr 14.04" (MiB 512) (GiB 1536)  (GiB 8);
+		hvm_linux_template "Ubuntu Xenial Xerus 16.04" (MiB 512) (GiB 1536)  (GiB 10);
 		hvm_linux_template "CoreOS" (MiB 512) (GiB 512) (GiB 5);
-		hvm_linux_template "Debian Jessie 8.0" (MiB 128) (GiB 1500)  (GiB 8);
+		hvm_linux_template "Debian Jessie 8.0" (MiB 128) (GiB 1536)  (GiB 8);
 		sles10sp1_template "SUSE Linux Enterprise Server 10 SP1" X32 [    ];
 		sles10_template    "SUSE Linux Enterprise Server 10 SP2" X32 [    ];
 		sles10_template    "SUSE Linux Enterprise Server 10 SP3" X32 [    ];
@@ -636,8 +636,8 @@ let create_all_templates rpc session_id =
 		sles12_template    "SUSE Linux Enterprise Desktop 12 SP1" X64 [    ];
 
  		debian_template "Debian Squeeze 6.0" "squeeze" X32 [    ];
- 		debian_template "Debian Squeeze 6.0" "squeeze" X64_debianlike ~max_mem_gib:70 [    ];
-		debian_template "Debian Wheezy 7.0" "wheezy" X32 [    ];
+ 		debian_template "Debian Squeeze 6.0" "squeeze" X64_debianlike [    ];
+		debian_template "Debian Wheezy 7.0" "wheezy" X32 ~max_mem_gib:64 [    ];
 		debian_template "Debian Wheezy 7.0" "wheezy" X64_debianlike ~max_mem_gib:128 [    ];
 
 		debian_template "Ubuntu Lucid Lynx 10.04" "lucid" X32 ~supports_cd:false ~max_vcpus:8 [    ];
