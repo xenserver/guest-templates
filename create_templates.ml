@@ -659,20 +659,20 @@ let create_all_templates rpc session_id =
 		other_install_media_template (default_memory_parameters 128L);
 		hvm_template "Windows Vista"              X32 1024 24   4 [n;  v;d] xenSERVER_device_id;
 		hvm_template "Windows 7"                  X32 1024 24   4 [n;  v;d] xenSERVER_device_id;
-		hvm_template "Windows 7"                  X64 2048 24 128 [n;  v;d] xenSERVER_device_id;
-		hvm_template "Windows 8"                  ~generation_id:true X32 1024 24   4 [n;v;s;d] xenSERVER_device_id;
-		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24 128 [n;v;s;d] xenSERVER_device_id;
-		hvm_template "Windows 10"                 ~generation_id:true X32 1024 24   4 [n;v;s;d] xenSERVER_device_id;
-		hvm_template "Windows 10"                 ~generation_id:true X64 2048 24 128 [n;v;s;d] xenSERVER_device_id;
-		hvm_template "Windows Server 2008"        X32  512 24  64 [n;  v;d] xenSERVER_device_id;
-		hvm_template "Windows Server 2008"        X32  512 24  64 [n;x;v;d] xenSERVER_device_id;
-		hvm_template "Windows Server 2008"        X64  512 24 1000 [n;  v;d] xenSERVER_device_id;
-		hvm_template "Windows Server 2008"        X64  512 24 1000 [n;x;v;d] xenSERVER_device_id;
-		hvm_template "Windows Server 2008 R2"     X64  512 24 1500 [n;  v;d] xenSERVER_device_id;
-		hvm_template "Windows Server 2008 R2"     X64  512 24 1500 [n;x;v;d] xenSERVER_device_id;
-		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 32 1500 [n;v;s;d] xenSERVER_device_id;
-		hvm_template "Windows Server 2012 R2"     ~generation_id:true X64 1024 32 1500 [n;v;s;d] xenSERVER_device_id;
-		hvm_template "Windows Server 2016"        ~generation_id:true X64 1024 32 1500 [n;v;s;d] xenSERVER_device_id;
+		hvm_template "Windows 7"                  X64 2048 24 192 [n;  v;d] xenSERVER_device_id;
+		hvm_template "Windows 8"                  ~generation_id:true X32 1024 24    4 [n;v;s;d] xenSERVER_device_id;
+		hvm_template "Windows 8"                  ~generation_id:true X64 2048 24  512 [n;v;s;d] xenSERVER_device_id;
+		hvm_template "Windows 10"                 ~generation_id:true X32 1024 24    4 [n;v;s;d] xenSERVER_device_id;
+		hvm_template "Windows 10"                 ~generation_id:true X64 2048 24 1536 [n;v;s;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2008"        X32  512 24   64 [n;  v;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2008"        X32  512 24   64 [n;x;v;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2008"        X64  512 24 1024 [n;  v;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2008"        X64  512 24 1024 [n;x;v;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2008 R2"     X64  512 24 1536 [n;  v;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2008 R2"     X64  512 24 1536 [n;x;v;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2012"     	  ~generation_id:true X64 1024 32 1536 [n;v;s;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2012 R2"     ~generation_id:true X64 1024 32 1536 [n;v;s;d] xenSERVER_device_id;
+		hvm_template "Windows Server 2016"        ~generation_id:true X64 1024 32 1536 [n;v;s;d] xenSERVER_device_id;
 	] in
 
 	(* put default_template key in static_templates other_config of static_templates: *)
