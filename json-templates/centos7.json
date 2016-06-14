@@ -1,0 +1,10 @@
+{
+	"uuid": "97840fa4-8526-72ef-916b-2ef014efa5e0",
+	"mac_seed": "2d63d5ed-954a-29f0-dd33-abed92749307",
+	"name_label": "CentOS 7",
+	"name_description": "To use this template from the CLI, install your VM using vm-install, then set other-config-install-repository to the path to your network repository, e.g. http://<server>/<path> or nfs:server:/<path>",
+	"type": "hvm",
+	"min_memory_gib": "1",
+	"max_memory_gib": "1536",
+	"root_disk_size_gib": "10"
+}
