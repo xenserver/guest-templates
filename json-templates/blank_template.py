@@ -118,11 +118,14 @@ class BlankTemplate(object):
                         for n,v in subvalue.items():
                             value = self.createMember(doc, struct, n)
 
+                            if isinstance(v, basestring) and v != "":
+                                value.appendChild(doc.createTextNode(v))
+
                             if isinstance(v, dict):
-                                struct = doc.createElement('struct')
-                                value.appendChild(struct)
+                                struct2 = doc.createElement('struct')
+                                value.appendChild(struct2)
                                 for n2,v2 in v.items():
-                                    value = self.createMember(doc, struct, n2)
+                                    value = self.createMember(doc, struct2, n2)
 
                                     if isinstance(v2, basestring) and v2 != "":
                                         value.appendChild(doc.createTextNode(v2))
@@ -143,19 +146,19 @@ class BlankTemplate(object):
                                         boolean.appendChild(doc.createTextNode("%i" % v2))
 
                                     elif isinstance(v2, list):
-                                        struct2 = doc.createElement('array')
-                                        value.appendChild(struct2)
+                                        struct3 = doc.createElement('array')
+                                        value.appendChild(struct3)
                                         data = doc.createElement('data')
-                                        struct2.appendChild(data)
+                                        struct3.appendChild(data)
                                         for n3,v3 in v2:
                                             value = self.createMember(doc, data, n3)
                                             value.appendChild(doc.createTextNode(v3))
 
                                     elif isinstance(v2, dict):
-                                        struct2 = doc.createElement('struct')
-                                        value.appendChild(struct2)
+                                        struct3 = doc.createElement('struct')
+                                        value.appendChild(struct3)
                                         for n3,v3 in v2.items():
-                                            value = self.createMember(doc, struct2, n3)
+                                            value = self.createMember(doc, struct3, n3)
                                             value.appendChild(doc.createTextNode(v3))
 
                                     elif isinstance(v2, int):
