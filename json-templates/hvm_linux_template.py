@@ -118,40 +118,21 @@ class Recommendations(object):
         root = doc.createElement('restrictions')
         doc.appendChild(root)
 
-        entry = doc.createElement('restriction')
-        root.appendChild(entry)
-        entry.setAttribute('field', 'memory-static-max')
-        entry.setAttribute('max', self.memory_static_max)
+        for field, attr in (('memory-static-max', 'max'),
+                            ('vcpus-max', 'max'),
+                            ('has-vendor-device', 'value'),
+                            ('allow-gpu-passthrough', 'value'),
+                            ('allow-vgpu', 'value')):
+            entry = doc.createElement('restriction')
+            root.appendChild(entry)
+            entry.setAttribute('field', field)
+            entry.setAttribute(attr, self.__dict__[field.replace('-', '_')])
 
-        entry = doc.createElement('restriction')
-        root.appendChild(entry)
-        entry.setAttribute('field', 'vcpus-max')
-        entry.setAttribute('max', self.vcpus_max)
-
-        entry = doc.createElement('restriction')
-        root.appendChild(entry)
-        entry.setAttribute('property', 'number-of-vbds')
-        entry.setAttribute('max', self.number_of_vbds)
-
-        entry = doc.createElement('restriction')
-        root.appendChild(entry)
-        entry.setAttribute('property', 'number-of-vifs')
-        entry.setAttribute('max', self.number_of_vifs)
-
-        entry = doc.createElement('restriction')
-        root.appendChild(entry)
-        entry.setAttribute('field', 'has-vendor-device')
-        entry.setAttribute('value', self.has_vendor_device)
-
-        entry = doc.createElement('restriction')
-        root.appendChild(entry)
-        entry.setAttribute('field', 'allow-gpu-passthrough')
-        entry.setAttribute('value', self.allow_gpu_passthrough)
-
-        entry = doc.createElement('restriction')
-        root.appendChild(entry)
-        entry.setAttribute('field', 'allow-vgpu')
-        entry.setAttribute('value', self.allow_vgpu)
+        for prop in ('number-of-vbds', 'number-of-vifs'):
+            entry = doc.createElement('restriction')
+            entry.setAttribute('property', prop)
+            entry.setAttribute('max', self.__dict__[prop.replace('-', '_')])
+            root.appendChild(entry)
 
         return doc.documentElement.toxml('utf-8')
 
