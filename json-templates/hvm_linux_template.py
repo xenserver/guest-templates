@@ -7,7 +7,7 @@ import os
 import subprocess
 import tarfile
 
-class HVMTemplate(blank_template.BlankTemplate):
+class HVMTemplate(blank_template.BaseTemplate):
 
     template = sys.argv[1]
     with open(template) as datafile:

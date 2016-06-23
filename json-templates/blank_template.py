@@ -5,24 +5,16 @@ from xml.dom import minidom
 class BlankTemplate(object):
     """Collection of common template parameters"""
 
-    def __init__(self, template):
-        self.uuid = template["uuid"]
+    def __init__(self):
         self.allowed_operations = []
         self.current_operations = {}
         self.power_state = constants.PowerStates.Halted
-        self.name_label = template["name_label"]
-        self.name_description = template["name_description"]
         self.user_version = 1
         self.is_a_template = True
         self.suspend_VDI = "OpaqueRef:NULL"
         self.resident_on = "OpaqueRef:NULL"
         self.affinity = "OpaqueRef:NULL"
         self.memory_overhead = "19922944"
-        self.memory_target = constants.memory_dynamic_max_mib * constants.mib
-        self.memory_static_max = constants.memory_static_max_mib  * constants.mib
-        self.memory_dynamic_max = constants.memory_dynamic_max_mib * constants.mib
-        self.memory_dynamic_min = constants.memory_dynamic_min_mib * constants.mib
-        self.memory_static_min = int(template["min_memory_gib"]) * constants.gib
         self.VCPUs_params = {}
         self.VCPUs_max = 1
         self.VCPUs_at_startup = 1
@@ -165,3 +157,15 @@ class BlankTemplate(object):
                                         value.appendChild(doc.createTextNode(str(v2)))
 
         return doc.toprettyxml(indent = '   ')
+
+class BaseTemplate(BlankTemplate):
+    def __init__(self, template):
+        super(BaseTemplate, self).__init__()
+        self.uuid = template["uuid"]
+        self.name_label = template["name_label"]
+        self.name_description = template["name_description"]
+        self.memory_target = constants.memory_dynamic_max_mib * constants.mib
+        self.memory_static_max = constants.memory_static_max_mib  * constants.mib
+        self.memory_dynamic_max = constants.memory_dynamic_max_mib * constants.mib
+        self.memory_dynamic_min = constants.memory_dynamic_min_mib * constants.mib
+        self.memory_static_min = int(template["min_memory_gib"]) * constants.gib
