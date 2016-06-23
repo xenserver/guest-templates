@@ -6,6 +6,7 @@ import constants
 import os
 import subprocess
 import tarfile
+import uuid
 
 class HVMTemplate(blank_template.BaseTemplate):
 
@@ -51,7 +52,10 @@ class Platform(object):
 class OtherConfig(object):
 
     def __init__(self, data):
-        self.mac_seed = data["mac_seed"]
+        if "mac_seed" in data:
+            self.mac_seed = data["mac_seed"]
+        else:
+            self.mac_seed = str(uuid.uuid4())
         self.default_template = "false"
         self.linux_template = "true"
         root_disk_size_gib = int(data["root_disk_size_gib"]) * constants.gib
