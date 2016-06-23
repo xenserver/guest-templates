@@ -17,7 +17,7 @@ class HVMTemplate(blank_template.BlankTemplate):
         super(HVMTemplate, self).__init__(self.data)
         self.platform = Platform().getPlatform()
         self.other_config = OtherConfig(self.data).getOtherConfig()
-        self.recommendations = Recommendations().toXML(int(self.data["max_memory_gib"]) * constants.gib)
+        self.recommendations = Recommendations(int(self.data["max_memory_gib"]) * constants.gib).toXML()
 
         # PV params
         self.PV_bootloader = ""
@@ -102,14 +102,17 @@ class Disk(object):
 # Template restrictions (added to recommendations field for clients, especially UI clients)
 class Recommendations(object):
 
-    vcpus_max = "32"
-    number_of_vbds = "255"
-    number_of_vifs = "7"
-    has_vendor_device = "false"
-    allow_gpu_passthrough = "1"
-    allow_vgpu = "1"
+    def __init__(self, memory_static_max):
 
-    def toXML(self, memory_static_max):
+        self.memory_static_max = str(memory_static_max)
+        self.vcpus_max = "32"
+        self.number_of_vbds = "255"
+        self.number_of_vifs = "7"
+        self.has_vendor_device = "false"
+        self.allow_gpu_passthrough = "1"
+        self.allow_vgpu = "1"
+
+    def toXML(self):
 
         doc = minidom.Document()
         root = doc.createElement('restrictions')
@@ -118,7 +121,7 @@ class Recommendations(object):
         entry = doc.createElement('restriction')
         root.appendChild(entry)
         entry.setAttribute('field', 'memory-static-max')
-        entry.setAttribute('max', str(memory_static_max))
+        entry.setAttribute('max', self.memory_static_max)
 
         entry = doc.createElement('restriction')
         root.appendChild(entry)
