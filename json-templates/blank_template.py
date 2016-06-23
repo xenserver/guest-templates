@@ -84,77 +84,71 @@ class BlankTemplate(object):
         main_struct = doc.createElement('struct')
         root.appendChild(main_struct)
 
-        for element_name, element_value in default_params.items():
+        ver_member = self.createMember(doc, main_struct, 'version')
+        struct = doc.createElement('struct')
+        ver_member.appendChild(struct)
 
-            if isinstance(element_value, dict):
-                value = self.createMember(doc, main_struct, element_name)
-                struct = doc.createElement('struct')
-                value.appendChild(struct)
-                for n,v in element_value.items():
-                    value = self.createMember(doc, struct, n)
-                    value.appendChild(doc.createTextNode(v))
+        for n, v in default_params['version'].items():
+            value = self.createMember(doc, struct, n)
+            value.appendChild(doc.createTextNode(v))
 
-            if isinstance(element_value, list):
-                value = self.createMember(doc, main_struct, element_name)
-                array = doc.createElement('array')
-                value.appendChild(array)
+        obj_member = self.createMember(doc, main_struct, 'objects')
+        obj_array = doc.createElement('array')
+        obj_member.appendChild(obj_array)
+        obj_data = doc.createElement('data')
+        obj_array.appendChild(obj_data)
+        obj_value = doc.createElement('value')
+        obj_data.appendChild(obj_value)
+        struct = doc.createElement('struct')
+        obj_value.appendChild(struct)
+
+        for n, v in (('class', 'VM'), ('id', 'Ref:0')):
+            value = self.createMember(doc, struct, n)
+            value.appendChild(doc.createTextNode(v))
+
+        snapshot = self.createMember(doc, struct, 'snapshot')
+        struct2 = doc.createElement('struct')
+        snapshot.appendChild(struct2)
+
+        for n2, v2 in self.__dict__.items():
+            value = self.createMember(doc, struct2, n2)
+
+            if isinstance(v2, basestring) and v2 != "":
+                value.appendChild(doc.createTextNode(v2))
+
+            elif isinstance(v2, datetime.datetime):
+                date = doc.createElement('dateTime.iso8601')
+                value.appendChild(date)
+                date.appendChild(doc.createTextNode(v2.strftime("%Y%m%dT%H:%M:%SZ")))
+
+            elif isinstance(v2, long):
+                double = doc.createElement('double')
+                value.appendChild(double)
+                double.appendChild(doc.createTextNode(str(v2)))
+
+            elif isinstance(v2, bool):
+                boolean = doc.createElement('boolean')
+                value.appendChild(boolean)
+                boolean.appendChild(doc.createTextNode("%i" % v2))
+
+            elif isinstance(v2, list):
+                struct3 = doc.createElement('array')
+                value.appendChild(struct3)
                 data = doc.createElement('data')
-                array.appendChild(data)
-                for subvalue in element_value:
-                    value =  doc.createElement('value')
-                    data.appendChild(value)
+                struct3.appendChild(data)
+                for n3,v3 in v2:
+                    value = self.createMember(doc, data, n3)
+                    value.appendChild(doc.createTextNode(v3))
 
-                    if isinstance(subvalue, dict):
-                        struct = doc.createElement('struct')
-                        value.appendChild(struct)
-                        for n,v in subvalue.items():
-                            value = self.createMember(doc, struct, n)
+            elif isinstance(v2, dict):
+                struct3 = doc.createElement('struct')
+                value.appendChild(struct3)
+                for n3,v3 in v2.items():
+                    value = self.createMember(doc, struct3, n3)
+                    value.appendChild(doc.createTextNode(v3))
 
-                            if isinstance(v, basestring) and v != "":
-                                value.appendChild(doc.createTextNode(v))
-
-                            if isinstance(v, dict):
-                                struct2 = doc.createElement('struct')
-                                value.appendChild(struct2)
-                                for n2,v2 in v.items():
-                                    value = self.createMember(doc, struct2, n2)
-
-                                    if isinstance(v2, basestring) and v2 != "":
-                                        value.appendChild(doc.createTextNode(v2))
-
-                                    elif isinstance(v2, datetime.datetime):
-                                        date = doc.createElement('dateTime.iso8601')
-                                        value.appendChild(date)
-                                        date.appendChild(doc.createTextNode(v2.strftime("%Y%m%dT%H:%M:%SZ")))
-
-                                    elif isinstance(v2, long):
-                                        double = doc.createElement('double')
-                                        value.appendChild(double)
-                                        double.appendChild(doc.createTextNode(str(v2)))
-
-                                    elif isinstance(v2, bool):
-                                        boolean = doc.createElement('boolean')
-                                        value.appendChild(boolean)
-                                        boolean.appendChild(doc.createTextNode("%i" % v2))
-
-                                    elif isinstance(v2, list):
-                                        struct3 = doc.createElement('array')
-                                        value.appendChild(struct3)
-                                        data = doc.createElement('data')
-                                        struct3.appendChild(data)
-                                        for n3,v3 in v2:
-                                            value = self.createMember(doc, data, n3)
-                                            value.appendChild(doc.createTextNode(v3))
-
-                                    elif isinstance(v2, dict):
-                                        struct3 = doc.createElement('struct')
-                                        value.appendChild(struct3)
-                                        for n3,v3 in v2.items():
-                                            value = self.createMember(doc, struct3, n3)
-                                            value.appendChild(doc.createTextNode(v3))
-
-                                    elif isinstance(v2, int):
-                                        value.appendChild(doc.createTextNode(str(v2)))
+            elif isinstance(v2, int):
+                value.appendChild(doc.createTextNode(str(v2)))
 
         return doc.toprettyxml(indent = '   ')
 
