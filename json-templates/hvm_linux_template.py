@@ -10,15 +10,11 @@ import uuid
 
 class HVMTemplate(blank_template.BaseTemplate):
 
-    template = sys.argv[1]
-    with open(template) as datafile:
-        data = json.load(datafile)
-
-    def __init__(self):
-        super(HVMTemplate, self).__init__(self.data)
+    def __init__(self, data):
+        super(HVMTemplate, self).__init__(data)
         self.platform = Platform().getPlatform()
-        self.other_config = OtherConfig(self.data).getOtherConfig()
-        self.recommendations = Recommendations(int(self.data["max_memory_gib"]) * constants.gib).toXML()
+        self.other_config = OtherConfig(data).getOtherConfig()
+        self.recommendations = Recommendations(int(data["max_memory_gib"]) * constants.gib).toXML()
 
         # PV params
         self.PV_bootloader = ""
@@ -140,15 +136,21 @@ class Recommendations(object):
 
         return doc.documentElement.toxml('utf-8')
 
+
+# Load datafile
+template = sys.argv[1]
+with open(template) as datafile:
+    data = json.load(datafile)
+
 # Generate ova.xml
 version = {'hostname': 'golm-2', 'date': '2016-04-29', 'product_version': '7.0.0', 'product_brand': 'XenServer', 'build_number': '125122c', 'xapi_major': '1', 'xapi_minor': '9', 'export_vsn': '2'}
-xml = HVMTemplate().toXML(version)
+xml = HVMTemplate(data).toXML(version)
 ova_xml = open("ova.xml", "w")
 ova_xml.write(xml)
 ova_xml.close()
 
 # Generate tarball containing ova.xml
-template_name = os.path.splitext(sys.argv[1])[0]
+template_name = os.path.splitext(template)[0]
 tar = tarfile.open("%s.tar" % template_name, "w")
 tar.add("ova.xml")
 tar.close()
