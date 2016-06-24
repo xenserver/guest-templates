@@ -75,7 +75,7 @@ class BlankTemplate(object):
 
         return value
 
-    def toXML(self, default_params):
+    def toXML(self, version):
 
         doc = minidom.Document()
         root = doc.createElement('value')
@@ -88,7 +88,7 @@ class BlankTemplate(object):
         struct = doc.createElement('struct')
         ver_member.appendChild(struct)
 
-        for n, v in default_params['version'].items():
+        for n, v in version.items():
             value = self.createMember(doc, struct, n)
             value.appendChild(doc.createTextNode(v))
 

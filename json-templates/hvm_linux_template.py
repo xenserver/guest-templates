@@ -142,9 +142,7 @@ class Recommendations(object):
 
 # Generate ova.xml
 version = {'hostname': 'golm-2', 'date': '2016-04-29', 'product_version': '7.0.0', 'product_brand': 'XenServer', 'build_number': '125122c', 'xapi_major': '1', 'xapi_minor': '9', 'export_vsn': '2'}
-objects = [{'class': 'VM', 'id': 'Ref:0', 'snapshot': HVMTemplate().__dict__}]
-default_params = {'version': version, 'objects': objects}
-xml = HVMTemplate().toXML(default_params)
+xml = HVMTemplate().toXML(version)
 ova_xml = open("ova.xml", "w")
 ova_xml.write(xml)
 ova_xml.close()
