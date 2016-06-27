@@ -5,5 +5,5 @@
 	"type": "hvm",
 	"min_memory_gib": "1",
 	"max_memory_gib": "1536",
-	"root_disk_size_gib": "10"
+	"disks": [ { "size_gb": 10 } ]
 }

@@ -29,7 +29,6 @@ class OtherConfig(object):
             self.mac_seed = str(uuid.uuid4())
         self.default_template = "false"
         self.linux_template = "true"
-        root_disk_size_gib = int(data["root_disk_size_gib"]) * constants.gib
         self.disks = DiskDevices(data).toXML()
         self.install_methods = "cdrom,nfs,http,ftp"
 
@@ -39,9 +38,12 @@ class OtherConfig(object):
 class DiskDevices(object):
 
     def __init__(self, data):
-        root_disk_size_gib = int(data["root_disk_size_gib"]) * constants.gib
-        disk0 = Disk(str(root_disk_size_gib), "", "true", "system")
-        self.disks = [disk0]
+        self.disks = []
+        for disk in data['disks']:
+            self.disks.append(Disk(disk['size_gb'],
+                                   disk.get('sr', ''),
+                                   disk.get('bootable', True),
+                                   disk.get('type', 'system')))
 
     def toXML(self):
         doc = minidom.Document()
@@ -53,23 +55,23 @@ class DiskDevices(object):
             entry = disk.getDiskEntry()
             entry.setAttribute('device', str(position))
             root.appendChild(entry)
-            position = position + 1
+            position += 1
 
         return doc.documentElement.toxml('utf-8')
 
 class Disk(object):
 
-    def __init__(self, size, sr, bootable, disk_type):
-        self.size = size
+    def __init__(self, size_gb, sr, bootable, disk_type):
+        self.size = size_gb * constants.gib
         self.sr = sr
-        self.bootable = bootable
+        self.bootable = 'true' if bootable else 'false'
         self.type = disk_type
 
     def getDiskEntry(self):
         doc = minidom.Document()
         entry = doc.createElement('disk')
         for element_name, element_value in self.__dict__.items():
-            entry.setAttribute(element_name, element_value)
+            entry.setAttribute(element_name, str(element_value))
 
         return entry
 
