@@ -26,23 +26,25 @@ class Platform(object):
 class OtherConfig(object):
 
     def __init__(self, data):
-        if "mac_seed" in data:
-            self.mac_seed = data["mac_seed"]
-        else:
-            self.mac_seed = str(uuid.uuid4())
-        self.default_template = "false"
-        self.linux_template = "true"
-        self.disks = DiskDevices(data).toXML()
-        self.install_methods = "cdrom,nfs,http,ftp"
+        self.mac_seed = data.get('mac_seed', str(uuid.uuid4()))
+        self.default_template = 'false' # cannot import with this set to 'true'
+        if 'disks' in data:
+            self.disks = DiskDevices(data['disks']).toXML()
+        if 'install_methods' in data:
+            self.install_methods = data['install_methods']
+        if 'linux_template' in data:
+            self.linux_template = "true"
+        if 'application_template' in data:
+            self.application_template = "1"
 
     def getOtherConfig(self):
         return self.__dict__
 
 class DiskDevices(object):
 
-    def __init__(self, data):
+    def __init__(self, disks):
         self.disks = []
-        for disk in data['disks']:
+        for disk in disks:
             self.disks.append(Disk(disk['size_gb'],
                                    disk.get('sr', ''),
                                    disk.get('bootable', True),
