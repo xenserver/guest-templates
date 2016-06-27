@@ -5,5 +5,8 @@
 	"type": "hvm",
 	"min_memory_gib": "1",
 	"max_memory_gib": "1536",
-	"disks": [ { "size_gb": 10 } ]
+	"disks": [ { "size_gb": 10 } ],
+	"vga": "std",
+	"videoram": 8,
+	"device_id": "0001"
 }

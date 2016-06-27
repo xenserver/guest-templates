@@ -6,16 +6,19 @@ from xml.dom import minidom
 
 class Platform(object):
 
-    def __init__(self):
-        self.nx = "true"
-        self.acpi = "1"
-        self.apic = "true"
-        self.pae = "true"
-        self.hpet = "true"
-        self.vga = "std"
-        self.videoram = "8"
-        self.viridian = "false"
-        self.device_id = "0001"
+    def __init__(self, data):
+        self.nx = 'true' if data.get('nx', True) else 'false'
+        self.acpi = '1' if data.get('acpi', True) else '0'
+        self.apic = 'true' if data.get('apic', True) else 'false'
+        self.pae = 'true' if data.get('pae', True) else 'false'
+        self.hpet = 'true' if data.get('hpet', True) else 'false'
+        if 'vga' in data:
+            self.vga = data['vga']
+        if 'videoram' in data:
+            self.videoram = str(data['videoram'])
+        self.virdian = 'true' if data.get('viridian', True) else 'false'
+        if 'device_id' in data:
+            self.device_id = data['device_id']
 
     def getPlatform(self):
         return self.__dict__
@@ -275,6 +278,6 @@ class BaseTemplate(BlankTemplate):
         self.memory_dynamic_max = constants.memory_dynamic_max_mib * constants.mib
         self.memory_dynamic_min = constants.memory_dynamic_min_mib * constants.mib
         self.memory_static_min = int(template["min_memory_gib"]) * constants.gib
-        self.platform = Platform().getPlatform()
+        self.platform = Platform(template).getPlatform()
         self.other_config = OtherConfig(template).getOtherConfig()
         self.recommendations = Recommendations(int(template["max_memory_gib"]) * constants.gib).toXML()
