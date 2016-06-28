@@ -1,8 +1,20 @@
 import constants
 import datetime
+import re
 import uuid
 from xml.dom import minidom
 
+
+def amount_to_int(amt):
+    scale = { 'T': 40, 't': 40, 'G': 30, 'g': 30, 'M': 20, 'm': 20, 'K': 10, 'k': 10 }
+
+    m = re.match(r'(\d+)([GgMmKk])?$', amt)
+    if not m:
+        raise ValueError("invalid amount: " + amt)
+    v = int(m.group(1))
+    if m.group(2):
+        v = v << scale[m.group(2)]
+    return v
 
 class Platform(object):
 
@@ -15,7 +27,7 @@ class Platform(object):
         if 'vga' in data:
             self.vga = data['vga']
         if 'videoram' in data:
-            self.videoram = str(data['videoram'])
+            self.videoram = str(amount_to_int(data['videoram']) >> 20)
         self.virdian = 'true' if data.get('viridian', True) else 'false'
         if 'device_id' in data:
             self.device_id = data['device_id']
@@ -45,7 +57,7 @@ class DiskDevices(object):
     def __init__(self, disks):
         self.disks = []
         for disk in disks:
-            self.disks.append(Disk(disk['size_gb'],
+            self.disks.append(Disk(disk['size'],
                                    disk.get('sr', ''),
                                    disk.get('bootable', True),
                                    disk.get('type', 'system')))
@@ -66,8 +78,8 @@ class DiskDevices(object):
 
 class Disk(object):
 
-    def __init__(self, size_gb, sr, bootable, disk_type):
-        self.size = size_gb * constants.gib
+    def __init__(self, size, sr, bootable, disk_type):
+        self.size = amount_to_int(size)
         self.sr = sr
         self.bootable = 'true' if bootable else 'false'
         self.type = disk_type
@@ -86,8 +98,8 @@ class Recommendations(object):
 
     def __init__(self, data):
 
-        if 'max_memory_gib' in data:
-            self.memory_static_max = str(data['max_memory_gib'] * constants.gib)
+        if 'max_memory' in data:
+            self.memory_static_max = str(amount_to_int(data['max_memory']))
         if 'vcpus_max' in data:
             self.vcpus_max = str(data['vcpus_max'])
         if 'number_of_vbds' in data:
@@ -285,7 +297,7 @@ class BaseTemplate(BlankTemplate):
         self.memory_static_max = constants.memory_static_max_mib  * constants.mib
         self.memory_dynamic_max = constants.memory_dynamic_max_mib * constants.mib
         self.memory_dynamic_min = constants.memory_dynamic_min_mib * constants.mib
-        self.memory_static_min = int(template["min_memory_gib"]) * constants.gib
+        self.memory_static_min = amount_to_int(template["min_memory"])
         self.platform = Platform(template).getPlatform()
         self.other_config = OtherConfig(template).getOtherConfig()
         self.recommendations = Recommendations(template).toXML()
