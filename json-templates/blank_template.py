@@ -84,15 +84,21 @@ class Disk(object):
 # Template restrictions (added to recommendations field for clients, especially UI clients)
 class Recommendations(object):
 
-    def __init__(self, memory_static_max):
+    def __init__(self, data):
 
-        self.memory_static_max = str(memory_static_max)
-        self.vcpus_max = "32"
-        self.number_of_vbds = "255"
-        self.number_of_vifs = "7"
-        self.has_vendor_device = "false"
-        self.allow_gpu_passthrough = "1"
-        self.allow_vgpu = "1"
+        if 'max_memory_gib' in data:
+            self.memory_static_max = str(data['max_memory_gib'] * constants.gib)
+        if 'vcpus_max' in data:
+            self.vcpus_max = str(data['vcpus_max'])
+        if 'number_of_vbds' in data:
+            self.number_of_vbds = str(data['number_of_vbds'])
+        if 'number_of_vifs' in data:
+            self.number_of_vifs = str(data['number_of_vifs'])
+        self.has_vendor_device = 'true' if data.get('has_vendor_device', False) else 'false'
+        if 'allow_gpu_passthrough' in data:
+            self.allow_gpu_passthrough = '1' if data['allow_gpu_passthrough'] else '0'
+        if 'allow_vgpu' in data:
+            self.allow_vgpu = '1' if data['allow_vgpu'] else '0'
 
     def toXML(self):
 
@@ -282,4 +288,4 @@ class BaseTemplate(BlankTemplate):
         self.memory_static_min = int(template["min_memory_gib"]) * constants.gib
         self.platform = Platform(template).getPlatform()
         self.other_config = OtherConfig(template).getOtherConfig()
-        self.recommendations = Recommendations(int(template["max_memory_gib"]) * constants.gib).toXML()
+        self.recommendations = Recommendations(template).toXML()
