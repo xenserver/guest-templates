@@ -293,11 +293,10 @@ class BaseTemplate(BlankTemplate):
         self.uuid = template["uuid"]
         self.name_label = template["name_label"]
         self.name_description = template["name_description"]
-        self.memory_target = constants.memory_dynamic_max_mib * constants.mib
-        self.memory_static_max = constants.memory_static_max_mib  * constants.mib
-        self.memory_dynamic_max = constants.memory_dynamic_max_mib * constants.mib
-        self.memory_dynamic_min = constants.memory_dynamic_min_mib * constants.mib
         self.memory_static_min = amount_to_int(template["min_memory"])
+        self.memory_static_max = self.memory_static_min * 2
+        self.memory_dynamic_min = self.memory_static_min * 2
+        self.memory_dynamic_max = self.memory_static_min * 2
         self.platform = Platform(template).getPlatform()
         self.other_config = OtherConfig(template).getOtherConfig()
         self.recommendations = Recommendations(template).toXML()
