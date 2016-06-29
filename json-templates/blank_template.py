@@ -17,25 +17,31 @@ def amount_to_int(amt):
         v = v << scale[m.group(2)]
     return v
 
+def get_bool_key(d, key, default):
+    v = d.get(key, default)
+    if isinstance(v, basestring):
+        v = v.lower() in ('t', 'true', 'y', 'yes', '1')
+    return v
+
 class Platform(object):
 
     def __init__(self, data, defaults = False):
         if defaults or 'nx' in data:
-            self.nx = 'true' if data.get('nx', True) else 'false'
+            self.nx = 'true' if get_bool_key(data, 'nx', True) else 'false'
         if defaults or 'acpi' in data:
-            self.acpi = '1' if data.get('acpi', True) else '0'
+            self.acpi = '1' if get_bool_key(data, 'acpi', True) else '0'
         if defaults or 'apic' in data:
-            self.apic = 'true' if data.get('apic', True) else 'false'
+            self.apic = 'true' if get_bool_key(data, 'apic', True) else 'false'
         if defaults or 'pae' in data:
-            self.pae = 'true' if data.get('pae', True) else 'false'
+            self.pae = 'true' if get_bool_key(data, 'pae', True) else 'false'
         if defaults or 'hpet' in data:
-            self.hpet = 'true' if data.get('hpet', True) else 'false'
+            self.hpet = 'true' if get_bool_key(data, 'hpet', True) else 'false'
         if 'vga' in data:
             self.vga = data['vga']
         if 'videoram' in data:
             self.videoram = str(amount_to_int(data['videoram']) >> 20)
         if defaults or 'virdian' in data:
-            self.virdian = 'true' if data.get('viridian', True) else 'false'
+            self.virdian = 'true' if get_bool_key(data, 'viridian', True) else 'false'
         if 'device_id' in data:
             self.device_id = data['device_id']
 
@@ -120,11 +126,11 @@ class Recommendations(object):
         if 'number_of_vifs' in data:
             self.number_of_vifs = str(data['number_of_vifs'])
         if defaults or 'has_vendor_device' in data:
-            self.has_vendor_device = 'true' if data.get('has_vendor_device', False) else 'false'
+            self.has_vendor_device = 'true' if get_bool_key(data, 'has_vendor_device', False) else 'false'
         if 'allow_gpu_passthrough' in data:
-            self.allow_gpu_passthrough = '1' if data['allow_gpu_passthrough'] else '0'
+            self.allow_gpu_passthrough = '1' if get_bool_key(data, 'allow_gpu_passthrough', False) else '0'
         if 'allow_vgpu' in data:
-            self.allow_vgpu = '1' if data['allow_vgpu'] else '0'
+            self.allow_vgpu = '1' if get_bool_key(data, 'allow_vgpu', False) else '0'
 
     def toXML(self):
 
