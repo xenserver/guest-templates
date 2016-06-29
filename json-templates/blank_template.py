@@ -1,5 +1,6 @@
 import constants
 import datetime
+import json
 import re
 import uuid
 from xml.dom import minidom
@@ -18,22 +19,31 @@ def amount_to_int(amt):
 
 class Platform(object):
 
-    def __init__(self, data):
-        self.nx = 'true' if data.get('nx', True) else 'false'
-        self.acpi = '1' if data.get('acpi', True) else '0'
-        self.apic = 'true' if data.get('apic', True) else 'false'
-        self.pae = 'true' if data.get('pae', True) else 'false'
-        self.hpet = 'true' if data.get('hpet', True) else 'false'
+    def __init__(self, data, defaults = False):
+        if defaults or 'nx' in data:
+            self.nx = 'true' if data.get('nx', True) else 'false'
+        if defaults or 'acpi' in data:
+            self.acpi = '1' if data.get('acpi', True) else '0'
+        if defaults or 'apic' in data:
+            self.apic = 'true' if data.get('apic', True) else 'false'
+        if defaults or 'pae' in data:
+            self.pae = 'true' if data.get('pae', True) else 'false'
+        if defaults or 'hpet' in data:
+            self.hpet = 'true' if data.get('hpet', True) else 'false'
         if 'vga' in data:
             self.vga = data['vga']
         if 'videoram' in data:
             self.videoram = str(amount_to_int(data['videoram']) >> 20)
-        self.virdian = 'true' if data.get('viridian', True) else 'false'
+        if defaults or 'virdian' in data:
+            self.virdian = 'true' if data.get('viridian', True) else 'false'
         if 'device_id' in data:
             self.device_id = data['device_id']
 
     def getPlatform(self):
         return self.__dict__
+
+    def update(self, new):
+        self.__dict__.update(new.__dict__)
 
 class OtherConfig(object):
 
@@ -51,6 +61,9 @@ class OtherConfig(object):
 
     def getOtherConfig(self):
         return self.__dict__
+
+    def update(self, new):
+        self.__dict__.update(new.__dict__)
 
 class DiskDevices(object):
 
@@ -96,7 +109,7 @@ class Disk(object):
 # Template restrictions (added to recommendations field for clients, especially UI clients)
 class Recommendations(object):
 
-    def __init__(self, data):
+    def __init__(self, data, defaults = False):
 
         if 'max_memory' in data:
             self.memory_static_max = str(amount_to_int(data['max_memory']))
@@ -106,7 +119,8 @@ class Recommendations(object):
             self.number_of_vbds = str(data['number_of_vbds'])
         if 'number_of_vifs' in data:
             self.number_of_vifs = str(data['number_of_vifs'])
-        self.has_vendor_device = 'true' if data.get('has_vendor_device', False) else 'false'
+        if defaults or 'has_vendor_device' in data:
+            self.has_vendor_device = 'true' if data.get('has_vendor_device', False) else 'false'
         if 'allow_gpu_passthrough' in data:
             self.allow_gpu_passthrough = '1' if data['allow_gpu_passthrough'] else '0'
         if 'allow_vgpu' in data:
@@ -126,15 +140,18 @@ class Recommendations(object):
             entry = doc.createElement('restriction')
             root.appendChild(entry)
             entry.setAttribute('field', field)
-            entry.setAttribute(attr, self.__dict__[field.replace('-', '_')])
+            entry.setAttribute(attr, self.__dict__.get(field.replace('-', '_'), ""))
 
         for prop in ('number-of-vbds', 'number-of-vifs'):
             entry = doc.createElement('restriction')
             entry.setAttribute('property', prop)
-            entry.setAttribute('max', self.__dict__[prop.replace('-', '_')])
+            entry.setAttribute('max', self.__dict__.get(prop.replace('-', '_'), ""))
             root.appendChild(entry)
 
         return doc.documentElement.toxml('utf-8')
+
+    def update(self, new):
+        self.__dict__.update(new.__dict__)
 
 
 class BlankTemplate(object):
@@ -292,16 +309,56 @@ class BlankTemplate(object):
 
         return doc.toprettyxml(indent = '   ')
 
+    def update(self, template):
+        self.__dict__.update(template)
+
 class BaseTemplate(BlankTemplate):
     def __init__(self, template):
+
         super(BaseTemplate, self).__init__()
-        self.uuid = template["uuid"]
-        self.name_label = template["name_label"]
-        self.name_description = template["name_description"]
-        self.memory_static_min = amount_to_int(template["min_memory"])
-        self.memory_static_max = self.memory_static_min * 2
-        self.memory_dynamic_min = self.memory_static_min * 2
-        self.memory_dynamic_max = self.memory_static_min * 2
         self.platform = Platform(template)
         self.other_config = OtherConfig(template)
         self.recommendations = Recommendations(template)
+        self.update(template, True)
+
+    def update(self, template, defaults = False):
+
+        whitelist = [
+            'uuid', 'name_label', 'name_description',
+            'HVM_boot_policy', 'HVM_boot_params',
+            'PV_bootloader', 'PV_kernel', 'PV_ramdisk', 'PV_args',
+            'PV_bootloader_args', 'PV_legacy_args'
+            ] + self.__dict__.keys()
+
+        # apply template values over current values
+        filtered_template = { k: v for k, v in template.iteritems() if k in whitelist }
+        super(BaseTemplate, self).update(filtered_template)
+
+        if "min_memory" in template:
+            self.memory_static_min = amount_to_int(template["min_memory"])
+            self.memory_static_max = self.memory_static_min * 2
+            self.memory_dynamic_min = self.memory_static_min * 2
+            self.memory_dynamic_max = self.memory_static_min * 2
+        if defaults or 'HVM_shadow_multiplier' in template:
+            self.HVM_shadow_multiplier = template.get('HVM_shadow_multiplier', 1.0)
+
+        # update contained objects
+        self.platform.update(Platform(template, defaults))
+        self.other_config.update(OtherConfig(template))
+        self.recommendations.update(Recommendations(template, defaults))
+
+def load_template(fname):
+    """ Read JSON template and create a template object. If one template derives
+    from another load that and apply changes upon that. """
+
+    with open(fname) as templatefile:
+        template = json.load(templatefile)
+
+    if 'derived_from' in template:
+        # load base template and overlay deltas
+        ret = load_template(template['derived_from'])
+        ret.update(template)
+    else:
+        ret = BaseTemplate(template)
+
+    return ret

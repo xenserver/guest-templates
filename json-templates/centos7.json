@@ -2,18 +2,8 @@
 	"uuid": "97840fa4-8526-72ef-916b-2ef014efa5e0",
 	"name_label": "CentOS 7",
 	"name_description": "To use this template from the CLI, install your VM using vm-install, then set other-config-install-repository to the path to your network repository, e.g. http://<server>/<path> or nfs:server:/<path>",
-	"type": "hvm",
+	"derived_from": "hvmlinux.json",
 	"min_memory": "1G",
 	"max_memory": "1536G",
-	"vcpus_max": 32,
-	"number_of_vbds": 255,
-	"number_of_vifs": 7,
-	"allow_gpu_passthrough": true,
-	"allow_vgpu": true,
-	"disks": [ { "size": "10G" } ],
-	"linux_template": true,
-	"install_methods": "cdrom,nfs,http,ftp",
-	"vga": "std",
-	"videoram": "8M",
-	"device_id": "0001"
+	"disks": [ { "size": "10G" } ]
 }

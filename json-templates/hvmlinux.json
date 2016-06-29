@@ -1,0 +1,22 @@
+{
+	"name_label": "HVM Linux",
+	"name_description": "Generic HVM Linux",
+	"vcpus_max": 32,
+	"number_of_vbds": 255,
+	"number_of_vifs": 7,
+	"allow_gpu_passthrough": true,
+	"allow_vgpu": true,
+	"linux_template": true,
+	"install_methods": "cdrom,nfs,http,ftp",
+	"vga": "std",
+	"videoram": "8M",
+	"device_id": "0001",
+	"HVM_boot_policy": "BIOS order",
+	"HVM_boot_params": { "order": "cdn" },
+	"PV_bootloader": "",
+	"PV_kernel": "",
+	"PV_ramdisk": "",
+	"PV_args": "",
+	"PV_bootloader_args": "",
+	"PV_legacy_args": ""
+}

@@ -1,6 +1,6 @@
 #!/bin/env python
 
-import hvm_linux_template
+import blank_template
 import json
 import os
 import subprocess
@@ -9,20 +9,19 @@ import tarfile
 
 if __name__ == '__main__':
 
-    # Load datafile
-    template = sys.argv[1]
-    with open(template) as datafile:
-        data = json.load(datafile)
+    # Load template
+    fname = sys.argv[1]
+    template = blank_template.load_template(fname)
 
     # Generate ova.xml
     version = {'hostname': 'golm-2', 'date': '2016-04-29', 'product_version': '7.0.0', 'product_brand': 'XenServer', 'build_number': '125122c', 'xapi_major': '1', 'xapi_minor': '9', 'export_vsn': '2'}
-    xml = hvm_linux_template.HVMTemplate(data).toXML(version)
+    xml = template.toXML(version)
     ova_xml = open("ova.xml", "w")
     ova_xml.write(xml)
     ova_xml.close()
 
     # Generate tarball containing ova.xml
-    template_name = os.path.splitext(template)[0]
+    template_name = os.path.splitext(fname)[0]
     tar = tarfile.open("%s.tar" % template_name, "w")
     tar.add("ova.xml")
     tar.close()
