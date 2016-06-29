@@ -18,4 +18,4 @@ class HVMTemplate(blank_template.BaseTemplate):
         # HVM params
         self.HVM_boot_policy = constants.hvm_boot_policy
         self.HVM_boot_params = constants.hvm_boot_params
-        self.HVM_shadow_multiplier = 1L
+        self.HVM_shadow_multiplier = 1.0

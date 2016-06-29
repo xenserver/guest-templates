@@ -256,7 +256,7 @@ class BlankTemplate(object):
                 value.appendChild(date)
                 date.appendChild(doc.createTextNode(v2.strftime("%Y%m%dT%H:%M:%SZ")))
 
-            elif isinstance(v2, long):
+            elif isinstance(v2, float):
                 double = doc.createElement('double')
                 value.appendChild(double)
                 double.appendChild(doc.createTextNode(str(v2)))
