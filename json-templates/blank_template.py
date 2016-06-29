@@ -212,6 +212,11 @@ class BlankTemplate(object):
 
     def toXML(self, version):
 
+        record_dict = dict(self.__dict__)
+        record_dict['platform'] = self.platform.getPlatform()
+        record_dict['other_config'] = self.other_config.getOtherConfig()
+        record_dict['recommendations'] = self.recommendations.toXML()
+
         doc = minidom.Document()
         root = doc.createElement('value')
         doc.appendChild(root)
@@ -245,7 +250,7 @@ class BlankTemplate(object):
         struct2 = doc.createElement('struct')
         snapshot.appendChild(struct2)
 
-        for n2, v2 in self.__dict__.items():
+        for n2, v2 in record_dict.items():
             value = self.createMember(doc, struct2, n2)
 
             if isinstance(v2, basestring) and v2 != "":
@@ -297,6 +302,6 @@ class BaseTemplate(BlankTemplate):
         self.memory_static_max = self.memory_static_min * 2
         self.memory_dynamic_min = self.memory_static_min * 2
         self.memory_dynamic_max = self.memory_static_min * 2
-        self.platform = Platform(template).getPlatform()
-        self.other_config = OtherConfig(template).getOtherConfig()
-        self.recommendations = Recommendations(template).toXML()
+        self.platform = Platform(template)
+        self.other_config = OtherConfig(template)
+        self.recommendations = Recommendations(template)
