@@ -139,10 +139,12 @@ class Recommendations(object):
                             ('has-vendor-device', 'value'),
                             ('allow-gpu-passthrough', 'value'),
                             ('allow-vgpu', 'value')):
-            entry = doc.createElement('restriction')
-            root.appendChild(entry)
-            entry.setAttribute('field', field)
-            entry.setAttribute(attr, self.__dict__.get(field.replace('-', '_'), ""))
+            field_ = field.replace('-', '_')
+            if field_ in self.__dict__:
+                entry = doc.createElement('restriction')
+                root.appendChild(entry)
+                entry.setAttribute('field', field)
+                entry.setAttribute(attr, self.__dict__[field_])
 
         for prop in ('number-of-vbds', 'number-of-vifs'):
             entry = doc.createElement('restriction')
