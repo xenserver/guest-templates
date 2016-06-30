@@ -14,7 +14,7 @@ if __name__ == '__main__':
     template = blank_template.load_template(fname)
 
     # Generate ova.xml
-    version = {'hostname': 'golm-2', 'date': '2016-04-29', 'product_version': '7.0.0', 'product_brand': 'XenServer', 'build_number': '125122c', 'xapi_major': '1', 'xapi_minor': '9', 'export_vsn': '2'}
+    version = {'hostname': 'localhost', 'date': '1970-01-01', 'product_version': '7.0.0', 'product_brand': 'XenServer', 'build_number': '0x', 'xapi_major': '1', 'xapi_minor': '9', 'export_vsn': '2'}
     xml = template.toXML(version)
     ova_xml = open("ova.xml", "w")
     ova_xml.write(xml)
