@@ -40,8 +40,8 @@ class Platform(object):
             self.vga = data['vga']
         if 'videoram' in data:
             self.videoram = str(amount_to_int(data['videoram']) >> 20)
-        if defaults or 'virdian' in data:
-            self.virdian = 'true' if get_bool_key(data, 'viridian', True) else 'false'
+        if defaults or 'viridian' in data:
+            self.viridian = 'true' if get_bool_key(data, 'viridian', True) else 'false'
         if 'device_id' in data:
             self.device_id = data['device_id']
 
