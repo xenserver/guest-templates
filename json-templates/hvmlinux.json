@@ -8,7 +8,7 @@
 	"allow_vgpu": true,
 	"other_config": {
 		"linux_template": "true",
-		"install_methods": "cdrom,nfs,http,ftp"
+		"install-methods": "cdrom,nfs,http,ftp"
 	},
 	"vga": "std",
 	"videoram": "8M",
