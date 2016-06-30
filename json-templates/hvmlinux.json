@@ -6,8 +6,10 @@
 	"number_of_vifs": 7,
 	"allow_gpu_passthrough": true,
 	"allow_vgpu": true,
-	"linux_template": true,
-	"install_methods": "cdrom,nfs,http,ftp",
+	"other_config": {
+		"linux_template": "true",
+		"install_methods": "cdrom,nfs,http,ftp"
+	},
 	"vga": "std",
 	"videoram": "8M",
 	"device_id": "0001",

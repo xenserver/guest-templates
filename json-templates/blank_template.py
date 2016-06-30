@@ -55,15 +55,11 @@ class OtherConfig(object):
 
     def __init__(self, data):
         self.mac_seed = data.get('mac_seed', str(uuid.uuid4()))
-        self.default_template = 'false' # cannot import with this set to 'true'
         if 'disks' in data:
             self.disks = DiskDevices(data['disks']).toXML()
-        if 'install_methods' in data:
-            self.install_methods = data['install_methods']
-        if 'linux_template' in data:
-            self.linux_template = "true"
-        if 'application_template' in data:
-            self.application_template = "1"
+        if 'other_config' in data:
+            self.__dict__.update(data['other_config'])
+        self.default_template = 'false' # cannot import with this set to 'true'
 
     def getOtherConfig(self):
         return self.__dict__
@@ -334,7 +330,8 @@ class BaseTemplate(BlankTemplate):
             'HVM_boot_policy', 'HVM_boot_params',
             'PV_bootloader', 'PV_kernel', 'PV_ramdisk', 'PV_args',
             'PV_bootloader_args', 'PV_legacy_args'
-            ] + self.__dict__.keys()
+            ] + \
+            [ k for k in self.__dict__.keys() if k != 'other_config' ]
 
         # apply template values over current values
         filtered_template = { k: v for k, v in template.iteritems() if k in whitelist }
