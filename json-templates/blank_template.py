@@ -168,7 +168,6 @@ class BlankTemplate(object):
         self.suspend_VDI = "OpaqueRef:NULL"
         self.resident_on = "OpaqueRef:NULL"
         self.affinity = "OpaqueRef:NULL"
-        self.memory_overhead = "19922944"
         self.VCPUs_params = {}
         self.VCPUs_max = 1
         self.VCPUs_at_startup = 1
