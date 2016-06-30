@@ -325,16 +325,17 @@ class BaseTemplate(BlankTemplate):
 
     def update(self, template, defaults = False):
 
-        whitelist = [
-            'uuid', 'name_label', 'name_description',
-            'HVM_boot_policy', 'HVM_boot_params',
-            'PV_bootloader', 'PV_kernel', 'PV_ramdisk', 'PV_args',
-            'PV_bootloader_args', 'PV_legacy_args'
-            ] + \
-            [ k for k in self.__dict__.keys() if k != 'other_config' ]
+        if defaults or 'HVM_boot_params' in template:
+            self.HVM_boot_params = template.get('HVM_boot_params', {})
+        for k in ('HVM_boot_policy', 'PV_bootloader', 'PV_kernel', 'PV_ramdisk', 'PV_args',
+                  'PV_bootloader_args', 'PV_legacy_args'):
+            if defaults or k in template:
+                self.__dict__[k] = template.get(k, '')
+
+        blacklist = ( 'platform', 'other_config', 'recommendations', 'disks' )
 
         # apply template values over current values
-        filtered_template = { k: v for k, v in template.iteritems() if k in whitelist }
+        filtered_template = { k: v for k, v in template.iteritems() if k not in blacklist }
         super(BaseTemplate, self).update(filtered_template)
 
         if "min_memory" in template:

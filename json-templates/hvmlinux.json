@@ -14,11 +14,5 @@
 	"videoram": "8M",
 	"device_id": "0001",
 	"HVM_boot_policy": "BIOS order",
-	"HVM_boot_params": { "order": "cdn" },
-	"PV_bootloader": "",
-	"PV_kernel": "",
-	"PV_ramdisk": "",
-	"PV_args": "",
-	"PV_bootloader_args": "",
-	"PV_legacy_args": ""
+	"HVM_boot_params": { "order": "cdn" }
 }
