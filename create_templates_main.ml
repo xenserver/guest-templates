@@ -30,7 +30,6 @@
  * SUCH DAMAGE.
  *)
 
-open Pervasiveext
 open Client
 
 let rpc xml =
@@ -40,6 +39,6 @@ let rpc xml =
 let _ =
 	let session_id = Client.Session.login_with_password
 		~rpc ~uname:"" ~pwd:"" ~version:"1.0" ~originator:"create_templates" in
-	finally
+	Stdext.Pervasiveext.finally
 		(fun () -> Create_templates.create_all_templates rpc session_id)
 		(fun () -> Client.Session.logout rpc session_id)
