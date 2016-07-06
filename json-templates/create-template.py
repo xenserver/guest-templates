@@ -46,10 +46,15 @@ if __name__ == '__main__':
 
     # Wait for import to complete
     task_status = 'pending'
-    while task_status == 'pending':
+    count = 0
+    while task_status == 'pending' and count < 20:
+        count += 1
         time.sleep(0.5)
         task_status = session.xenapi.task.get_status(task_ref)
     session.xenapi.task.destroy(task_ref)
+    if task_status == 'pending':
+        session.xenapi.session.logout()
+        raise RuntimeError("Template import timeout")
 
     # Set default_template = true
     template_ref = session.xenapi.VM.get_by_uuid(template.uuid)
