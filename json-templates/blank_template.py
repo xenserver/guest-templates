@@ -9,7 +9,7 @@ from xml.dom import minidom
 def amount_to_int(amt):
     scale = { 'T': 40, 't': 40, 'G': 30, 'g': 30, 'M': 20, 'm': 20, 'K': 10, 'k': 10 }
 
-    m = re.match(r'(\d+)([GgMmKk])?$', amt)
+    m = re.match(r'(\d+)([TtGgMmKk])?$', amt)
     if not m:
         raise ValueError("invalid amount: " + amt)
     v = int(m.group(1))
