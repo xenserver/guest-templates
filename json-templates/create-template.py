@@ -1,11 +1,15 @@
 #!/bin/env python
 
 import blank_template
+import httplib
 import json
 import os
 import subprocess
 import sys
 import tarfile
+import time
+import urllib
+import XenAPI
 
 if __name__ == '__main__':
 
@@ -27,8 +31,30 @@ if __name__ == '__main__':
     tar.close()
     os.remove("ova.xml")
 
+    # Create session to XAPI
+    session = XenAPI.xapi_local()
+    session.xenapi.login_with_password('', '', '', 'create-template')
+
     # Import XS template
-    uuid = subprocess.check_output(["xe", "vm-import", "filename=%s.tar" % template_name, "preserve=true"])
+    task_ref = session.xenapi.task.create("import-%s" % template.uuid, "Import of template %s" % template.uuid)
+    fh = open("%s.tar" % template_name)
+    conn = httplib.HTTPConnection("localhost", 80)
+    params = urllib.urlencode({'session_id': session._session, 'task_id': task_ref, 'restore': 'true', 'uuid': template.uuid})
+    conn.request("PUT", "/import_metadata?" + params, fh)
+    response = conn.getresponse()
+    fh.close()
+
+    # Wait for import to complete
+    task_status = 'pending'
+    while task_status == 'pending':
+        time.sleep(0.5)
+        task_status = session.xenapi.task.get_status(task_ref)
+    session.xenapi.task.destroy(task_ref)
 
     # Set default_template = true
-    out = subprocess.check_output(["xe", "template-param-set", "other-config:default_template=true", "uuid=%s" % uuid.strip()])
+    template_ref = session.xenapi.VM.get_by_uuid(template.uuid)
+    other_config = session.xenapi.VM.get_other_config(template_ref)
+    other_config['default_template'] = 'true'
+    session.xenapi.VM.set_other_config(template_ref, other_config)
+
+    session.xenapi.session.logout()
