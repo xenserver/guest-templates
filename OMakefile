@@ -4,7 +4,7 @@ DESTDIR=$(getenv DESTDIR, $(ROOT)/dist/staging)
 LIBEXEC=$(DESTDIR)/opt/xensource/libexec
 FIRSTBOOT=$(DESTDIR)/etc/firstboot.d
 
-IEXE=install -m 755 -o root -g root
+IEXE=install -m 755
 
 OCAMLPACKS = xapi-client threads
 
