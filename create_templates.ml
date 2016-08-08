@@ -236,6 +236,7 @@ let blank_template memory = {
 	vM_attached_PCIs = [];
 	vM_version = 0L;
 	vM_generation_id = "";
+	vM_requires_reboot = false;
 }
 
 let other_install_media_template memory = 
